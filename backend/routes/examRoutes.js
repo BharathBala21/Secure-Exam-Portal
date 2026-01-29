@@ -6,9 +6,12 @@ const {
     getExamById,
     submitExam,
     evaluateSubmission,
-    getResults
+    getResults,
+    parseExamExcel
 } = require('../controllers/examController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.route('/')
     .get(protect, getExams)
@@ -21,5 +24,6 @@ router.route('/:id')
 
 router.post('/submit', protect, authorize('Student'), submitExam);
 router.post('/evaluate/:id', protect, authorize('Faculty', 'Admin'), evaluateSubmission);
+router.post('/upload-excel', protect, authorize('Faculty', 'Admin'), upload.single('file'), parseExamExcel);
 
 module.exports = router;

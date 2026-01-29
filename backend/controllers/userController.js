@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { generateRSAKeys } = require('../utils/security');
 const { createAuditLog } = require('../utils/auditLogger');
+const sendEmail = require('../utils/sendEmail');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -82,10 +83,29 @@ const loginUser = async (req, res, next) => {
                 ipAddress: req.ip
             });
 
-            console.log(`[SIMULATED EMAIL] OTP for ${user.email}: ${otp}`);
+            try {
+                await sendEmail({
+                    to: user.email,
+                    subject: 'MFA Security Code - Secure Exam Portal',
+                    text: `Your one-time security code is: ${otp}. This code expires in 10 minutes.`,
+                    html: `
+                        <div style="font-family: sans-serif; padding: 20px; background: #0f172a; color: #f1f5f9; border-radius: 20px;">
+                            <h2 style="color: #6366f1;">Security Authentication</h2>
+                            <p>An access attempt was detected for your account. Use the code below to complete verification:</p>
+                            <div style="background: #1e293b; padding: 20px; font-size: 32px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #fff; border-radius: 10px; margin: 20px 0;">
+                                ${otp}
+                            </div>
+                            <p style="color: #64748b; font-size: 12px;">This is a NIST-compliant possession-based factor. If you did not request this, please change your password immediately.</p>
+                        </div>
+                    `
+                });
+            } catch (emailError) {
+                console.error('Failed to send real email, falling back to console log for development.');
+                console.log(`[FALLBACK] OTP for ${user.email}: ${otp}`);
+            }
 
             res.json({
-                message: 'OTP sent to email',
+                message: 'OTP sent to your academic email',
                 email: user.email,
                 mfaRequired: true
             });

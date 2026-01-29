@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Save, FileText, Calendar, Clock, Layout, ListChecks, Loader2, ChevronRight, AlertCircle, Info } from 'lucide-react';
+import { Plus, Trash2, Save, FileText, Calendar, Clock, Layout, ListChecks, Loader2, ChevronRight, AlertCircle, Info, FileSpreadsheet, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ExamCreator = () => {
@@ -13,6 +13,8 @@ const ExamCreator = () => {
         questions: [{ questionText: '', options: ['', '', '', ''], correctOption: 0, marks: 1 }]
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [isParsing, setIsParsing] = useState(false);
+    const fileInputRef = React.useRef(null);
     const navigate = useNavigate();
 
     const addQuestion = () => {
@@ -38,6 +40,38 @@ const ExamCreator = () => {
         const newQs = [...examData.questions];
         newQs[qIdx].options[oIdx] = value;
         setExamData({ ...examData, questions: newQs });
+    };
+
+    const handleExcelUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsParsing(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            };
+            const { data } = await axios.post('/api/exams/upload-excel', formData, config);
+
+            // Overwrite or Append? Let's overwrite for simplicity or confirm.
+            setExamData({
+                ...examData,
+                questions: data.questions
+            });
+            alert(`Successfully ingested ${data.questions.length} questions from Excel matrix.`);
+        } catch (err) {
+            alert('Failed to parse Excel sheet. Ensure the format matches: Question, A, B, C, D, Correct, Marks');
+        } finally {
+            setIsParsing(false);
+            e.target.value = null; // Reset input
+        }
     };
 
     const handleCreate = async (e) => {
@@ -68,11 +102,29 @@ const ExamCreator = () => {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
-                    <Info className="text-indigo-400" size={18} />
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
-                        Submissions auto-signed <br /> <span className="text-indigo-300">via RSA-2048</span>
-                    </p>
+                <div className="flex items-center gap-3">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleExcelUpload}
+                        accept=".xlsx, .xls, .csv"
+                        className="hidden"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current.click()}
+                        disabled={isParsing}
+                        className="flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white px-5 py-3 rounded-2xl border border-emerald-500/20 transition-all font-bold text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/5 active:scale-95"
+                    >
+                        {isParsing ? <Loader2 size={18} className="animate-spin" /> : <FileSpreadsheet size={18} />}
+                        {isParsing ? 'Parsing...' : 'Import Excel'}
+                    </button>
+                    <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-3 rounded-2xl">
+                        <Info className="text-indigo-400" size={18} />
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
+                            Submissions auto-signed <br /> <span className="text-indigo-300">via RSA-2048</span>
+                        </p>
+                    </div>
                 </div>
             </header>
 

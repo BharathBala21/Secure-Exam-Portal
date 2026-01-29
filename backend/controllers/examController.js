@@ -3,6 +3,7 @@ const Submission = require('../models/Submission');
 const User = require('../models/User');
 const { encryptAES, decryptAES, verifySignature } = require('../utils/security');
 const { createAuditLog } = require('../utils/auditLogger');
+const xlsx = require('xlsx');
 
 /**
  * Create Exam (Faculty only)
@@ -170,12 +171,47 @@ const getResults = async (req, res, next) => {
     }
 };
 
+const parseExamExcel = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const data = xlsx.utils.sheet_to_json(sheet);
+
+        // Map Excel columns to Question schema
+        // Expected columns: Question, A, B, C, D, Correct, Marks
+        const questions = data.map(row => ({
+            questionText: row.Question !== undefined ? row.Question : row.questionText,
+            options: [
+                row.A !== undefined ? row.A : row.option1,
+                row.B !== undefined ? row.B : row.option2,
+                row.C !== undefined ? row.C : row.option3,
+                row.D !== undefined ? row.D : row.option4
+            ],
+            correctOption: row.Correct !== undefined ? Number(row.Correct) : (row.correctOption !== undefined ? Number(row.correctOption) : 0),
+            marks: Number(row.Marks !== undefined ? row.Marks : (row.marks !== undefined ? row.marks : 1))
+        }));
+
+        res.json({
+            message: 'Excel parsed successfully',
+            questions
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createExam,
     getExams,
     getExamById,
     submitExam,
     evaluateSubmission,
-    getResults
+    getResults,
+    parseExamExcel
 };
 

@@ -1,0 +1,5 @@
+Question,A,B,C,D,Correct,Marks
+"What is the primary algorithm used for digital signatures in this portal?","AES-256","SHA-256","RSA-2048","MD5",2,5
+"Which NIST standard is followed for MFA in this system?","SP 800-63-3","ISO 27001","HIPAA","PCI-DSS",0,2
+"What does AES stand for in cryptography?","Advanced Encryption Standard","Automated Email System","Asymmetric Entry System","Applied Encryption Schema",0,1
+"Which component is stored locally to sign student submissions?","Public Key","Private Key","Salt","JWT Token",1,4

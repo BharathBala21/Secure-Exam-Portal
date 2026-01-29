@@ -89,6 +89,11 @@ const rejectUser = async (req, res, next) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Prevent self-deletion
+        if (user._id.toString() === req.user._id.toString()) {
+            return res.status(400).json({ message: 'Administrative Protocol: Self-deletion is restricted to prevent network lockouts.' });
+        }
+
         await User.findByIdAndDelete(req.params.id);
 
         await createAuditLog({

@@ -82,27 +82,27 @@ const Dashboard = ({ user }) => {
             {/* Top Stats - Dynamic labels based on identity role */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <StatCard
-                    title={user.role === 'Student' ? "Tests Available" : "Active Modules"}
-                    value={stats.activeExams}
-                    icon={<BookOpen size={24} />}
-                    trend={user.role === 'Student' ? "Current" : "+12%"}
-                    color="coral"
+                    title={user.role === 'Admin' ? "Total Identities" : (user.role === 'Student' ? "Tests Available" : "Active Modules")}
+                    value={user.role === 'Admin' ? stats.totalUsers : stats.activeExams}
+                    icon={<Users size={24} />}
+                    trend={user.role === 'Admin' ? "Verified Nodes" : (user.role === 'Student' ? "Current" : "+12%")}
+                    color={user.role === 'Admin' ? "dark" : "coral"}
                     isLoading={isLoading}
                 />
                 <StatCard
-                    title={user.role === 'Student' ? "My Average" : "Mean Performance"}
-                    value={stats.meanScore}
-                    icon={<Activity size={24} />}
-                    trend={user.role === 'Student' ? "Aggregated" : "+8%"}
+                    title={user.role === 'Admin' ? "Forensic Logs" : (user.role === 'Student' ? "My Average" : "Mean Performance")}
+                    value={user.role === 'Admin' ? stats.totalAudits : stats.meanScore}
+                    icon={<Fingerprint size={24} />}
+                    trend={user.role === 'Admin' ? "Synchronized" : (user.role === 'Student' ? "Aggregated" : "+8%")}
                     color="mint"
                     isLoading={isLoading}
                 />
                 <StatCard
-                    title={user.role === 'Student' ? "Tests Taken" : "System Nodes"}
-                    value={stats.activeUsers}
-                    icon={<Users size={24} />}
-                    trend={user.role === 'Student' ? "Completed" : "+2"}
-                    color="dark"
+                    title={user.role === 'Admin' ? "Pending Actions" : (user.role === 'Student' ? "Tests Taken" : "System Nodes")}
+                    value={user.role === 'Admin' ? stats.pendingUsers : stats.activeUsers}
+                    icon={<ShieldCheck size={24} />}
+                    trend={user.role === 'Admin' ? "Requires Handshake" : (user.role === 'Student' ? "Completed" : "+2")}
+                    color="coral"
                     isLoading={isLoading}
                 />
             </div>
@@ -112,27 +112,33 @@ const Dashboard = ({ user }) => {
                 <div className="lg:col-span-2 surface-card p-10">
                     <div className="flex items-center justify-between mb-10">
                         <h2 className="text-xl font-black tracking-tight flex items-center gap-3">
-                            {user.role === 'Student' ? 'Assessment' : 'Portal'} <span className="text-text-muted italic">activity</span>
+                            {user.role === 'Student' ? 'Assessment' : (user.role === 'Admin' ? 'Identity' : 'Portal')} <span className="text-text-muted italic">{user.role === 'Admin' ? 'control' : 'activity'}</span>
                         </h2>
-                        <span className="badge-mint">Live Monitoring</span>
+                        {user.role === 'Admin' ? (
+                            <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-text-main flex items-center gap-2">
+                                Full Registry <ArrowUpRight size={14} />
+                            </Link>
+                        ) : (
+                            <span className="badge-mint">Live Monitoring</span>
+                        )}
                     </div>
 
                     <div className="space-y-6">
                         {user.role === 'Student' ? (
-                            <>
-                                <div className="p-10 border-dashed border-2 border-black/5 rounded-[2rem] flex flex-col items-center justify-center text-center gap-6">
-                                    <div className="w-16 h-16 bg-sidebar-bg rounded-full flex items-center justify-center text-text-muted">
-                                        <Award size={32} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-black text-text-main italic uppercase tracking-tighter text-xl">Result Hub</h3>
-                                        <p className="text-text-muted text-sm mt-2 max-w-xs mx-auto">Your cryptographically signed performance ledger is available for review.</p>
-                                    </div>
-                                    <Link to="/results" className="btn-primary w-full max-w-[200px] h-12 text-[10px]">
-                                        View All Records <ArrowUpRight size={14} className="ml-2" />
-                                    </Link>
+                            <div className="p-10 border-dashed border-2 border-black/5 rounded-[2rem] flex flex-col items-center justify-center text-center gap-6">
+                                <div className="w-16 h-16 bg-sidebar-bg rounded-full flex items-center justify-center text-text-muted">
+                                    <Award size={32} />
                                 </div>
-                            </>
+                                <div>
+                                    <h3 className="font-black text-text-main italic uppercase tracking-tighter text-xl">Result Hub</h3>
+                                    <p className="text-text-muted text-sm mt-2 max-w-xs mx-auto">Your cryptographically signed performance ledger is available for review.</p>
+                                </div>
+                                <Link to="/results" className="btn-primary w-full max-w-[200px] h-12 text-[10px]">
+                                    View All Records <ArrowUpRight size={14} className="ml-2" />
+                                </Link>
+                            </div>
+                        ) : user.role === 'Admin' ? (
+                            <AdminUserQuickControl user={user} />
                         ) : (
                             [
                                 { action: 'Identity Verification', details: 'NIST 800-63-2 MFA validated via protocol', time: 'Just now', color: 'mint' },
@@ -167,16 +173,20 @@ const Dashboard = ({ user }) => {
                         </div>
                         <h3 className="text-2xl font-black italic tracking-tighter mb-4">Identity Assurance</h3>
                         <p className="text-sm text-white/60 leading-relaxed font-medium">
-                            Your environment is currently participating in the Decentralized Academic Network under NIST Level 3 protocols.
+                            {user.role === 'Admin'
+                                ? "Administrative override active. You have full oversight of the cryptographic node network and identity registry."
+                                : "Your environment is currently participating in the Decentralized Academic Network under NIST Level 3 protocols."}
                         </p>
                     </div>
 
                     <div className="relative z-10 space-y-4">
                         <div className="h-[1px] bg-white/10 w-full mb-6"></div>
                         <div className="flex flex-col gap-3">
-                            <Link to="/audit" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
-                                <Fingerprint size={14} /> Audit Node forensics
-                            </Link>
+                            {(user.role === 'Admin' || user.role === 'Faculty') && (
+                                <Link to="/audit" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+                                    <Fingerprint size={14} /> Audit Node forensics
+                                </Link>
+                            )}
                             {user.role === 'Admin' && (
                                 <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
                                     <Users size={14} /> Identity Registry
@@ -187,6 +197,72 @@ const Dashboard = ({ user }) => {
                 </div>
             </div>
         </motion.div>
+    );
+};
+
+const AdminUserQuickControl = ({ user }) => {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchUsers = async () => {
+        try {
+            const config = { headers: { Authorization: `Bearer ${user.token}` } };
+            const { data } = await axios.get('/api/admin/all', config);
+            setUsers(data.slice(0, 5)); // Show only 5 for quick control
+        } catch (err) {
+            console.error('Failed to fetch users');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const removeUser = async (id) => {
+        if (!window.confirm('Are you sure you want to purge this identity from the network?')) return;
+        try {
+            const config = { headers: { Authorization: `Bearer ${user.token}` } };
+            await axios.delete(`/api/admin/reject/${id}`, config);
+            fetchUsers();
+        } catch (err) {
+            alert('Purge failed');
+        }
+    };
+
+    if (loading) return <div className="flex justify-center p-10"><Zap className="animate-spin text-text-muted" /></div>;
+
+    return (
+        <div className="space-y-4">
+            {users.map((u) => (
+                <div key={u._id} className="flex items-center justify-between p-5 bg-sidebar-bg/50 rounded-2xl border border-transparent hover:border-black/5 hover:bg-white transition-all group">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-accent-dark flex items-center justify-center text-white text-xs font-black">
+                            {u.role[0]}
+                        </div>
+                        <div>
+                            <p className="font-bold text-text-main text-sm uppercase italic">{u.name}</p>
+                            <p className="text-[10px] text-text-muted font-black tracking-widest leading-none mt-1">{u.email}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${u.isApproved ? 'bg-accent-mint/10 text-accent-mint' : 'bg-accent-coral/10 text-accent-coral'}`}>
+                            {u.isApproved ? 'Active' : 'Pending'}
+                        </span>
+                        {u._id !== user._id && (
+                            <button
+                                onClick={() => removeUser(u._id)}
+                                className="p-2 text-text-muted hover:text-accent-coral transition-colors opacity-0 group-hover:opacity-100"
+                                title="Purge Identity"
+                            >
+                                <Shield size={16} />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            ))}
+        </div>
     );
 };
 

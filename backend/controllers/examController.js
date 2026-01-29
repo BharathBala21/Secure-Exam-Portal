@@ -3,6 +3,7 @@ const Submission = require('../models/Submission');
 const User = require('../models/User');
 const { encryptAES, decryptAES, verifySignature } = require('../utils/security');
 const { createAuditLog } = require('../utils/auditLogger');
+const AuditLog = require('../models/AuditLog');
 const xlsx = require('xlsx');
 
 /**
@@ -275,6 +276,20 @@ const getDashboardStats = async (req, res, next) => {
                 activeUsers: examsTaken, // Reusing field for tests taken in basic response
                 avgDuration: 'N/A',
                 isStudent: true
+            });
+        }
+
+        if (req.user.role === 'Admin') {
+            const totalUsers = await User.countDocuments({});
+            const totalAudits = await AuditLog.countDocuments({});
+            const pendingUsers = await User.countDocuments({ isApproved: false });
+
+            return res.json({
+                totalUsers,
+                totalAudits,
+                pendingUsers,
+                isStudent: false,
+                isAdmin: true
             });
         }
 

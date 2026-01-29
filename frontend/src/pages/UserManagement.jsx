@@ -162,22 +162,26 @@ const UserManagement = ({ user }) => {
                                                     <UserCheck size={18} className="mr-2" />
                                                     Authorize
                                                 </button>
+                                                {u._id !== user._id && (
+                                                    <button
+                                                        onClick={() => handleReject(u._id)}
+                                                        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white border border-black/5 text-text-muted hover:text-red-500 hover:border-red-200 transition-all shadow-sm"
+                                                        title="Purge Request"
+                                                    >
+                                                        <UserX size={20} />
+                                                    </button>
+                                                )}
+                                            </>
+                                        ) : (
+                                            u._id !== user._id && (
                                                 <button
                                                     onClick={() => handleReject(u._id)}
                                                     className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white border border-black/5 text-text-muted hover:text-red-500 hover:border-red-200 transition-all shadow-sm"
-                                                    title="Purge Request"
+                                                    title="Revoke Permission"
                                                 >
-                                                    <UserX size={20} />
+                                                    <Trash2 size={20} />
                                                 </button>
-                                            </>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleReject(u._id)}
-                                                className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white border border-black/5 text-text-muted hover:text-red-500 hover:border-red-200 transition-all shadow-sm"
-                                                title="Revoke Permission"
-                                            >
-                                                <Trash2 size={20} />
-                                            </button>
+                                            )
                                         )}
                                     </div>
                                 </div>

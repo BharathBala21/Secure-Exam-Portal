@@ -7,7 +7,8 @@ const {
     submitExam,
     evaluateSubmission,
     getResults,
-    parseExamExcel
+    parseExamExcel,
+    getDashboardStats
 } = require('../controllers/examController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const multer = require('multer');
@@ -18,6 +19,7 @@ router.route('/')
     .post(protect, authorize('Faculty', 'Admin'), createExam);
 
 router.get('/results', protect, getResults);
+router.get('/stats', protect, getDashboardStats);
 
 router.route('/:id')
     .get(protect, getExamById);

@@ -25,32 +25,29 @@ function App() {
     }, []);
 
     const logout = () => {
-        localStorage.removeItem('userInfo');
-        setUser(null);
-        navigate('/login');
+        if (window.confirm("End secure session?")) {
+            localStorage.removeItem('userInfo');
+            setUser(null);
+            navigate('/login');
+        }
     };
 
     if (initializing) return null;
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-indigo-500/30 selection:text-indigo-200">
-            {/* Dynamic Background */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px]"></div>
-            </div>
-
-            <div className="relative z-10 flex flex-col min-h-screen">
+        <div className="min-h-screen bg-page-bg text-text-main overflow-x-hidden flex">
+            {/* Minimalist Sidebar Layout support or standard container */}
+            <div className="flex-1 flex flex-col min-h-screen">
                 <Navbar user={user} logout={logout} />
 
-                <main className="flex-1 container mx-auto px-4 py-8 md:py-12 max-w-7xl">
+                <main className="flex-1 container mx-auto px-6 pt-24 pb-12 max-w-7xl relative z-10">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={location.pathname}
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                         >
                             <Routes location={location}>
                                 <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
@@ -68,19 +65,8 @@ function App() {
                     </AnimatePresence>
                 </main>
 
-                <footer className="py-6 border-t border-white/5 bg-slate-950/50 backdrop-blur-md">
-                    <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>
-                            Secure Infrastructure v4.0.2
-                        </div>
-
-                        <p className="text-[10px] text-slate-600 font-medium text-center md:text-right">
-                            Digital Signature Protocol: RSA-2048/SHA-256 <br className="md:hidden" />
-                            <span className="mx-2 hidden md:inline">|</span>
-                            Confidentiality Standard: AES-256-CBC
-                        </p>
-                    </div>
+                <footer className="py-8 text-center text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">
+                    Secure Exam Portal • Infrastructure STABLE • 2026
                 </footer>
             </div>
         </div>

@@ -1,21 +1,48 @@
-import React from 'react';
-import { Shield, BookOpen, Clock, FileText, CheckCircle, ArrowUpRight, Activity, Zap, Fingerprint, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+    Shield, BookOpen, Clock, FileText, CheckCircle,
+    ArrowUpRight, Activity, Zap, Fingerprint, Users,
+    Layout, Plus, BarChart3, ShieldCheck, Award
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Dashboard = ({ user }) => {
-    const container = {
+    const [stats, setStats] = useState({
+        activeExams: 0,
+        meanScore: 0,
+        avgDuration: '0m',
+        pendingUsers: 0,
+        activeUsers: 0
+    });
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const config = { headers: { Authorization: `Bearer ${user.token}` } };
+                const { data } = await axios.get('/api/exams/stats', config);
+                setStats(data);
+            } catch (err) {
+                console.error('Stats fetch failed');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchStats();
+    }, [user]);
+
+    const containerVariants = {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
+            transition: { staggerChildren: 0.1 }
         }
     };
 
-    const item = {
-        hidden: { opacity: 0, y: 20 },
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15 },
         show: { opacity: 1, y: 0 }
     };
 
@@ -23,160 +50,179 @@ const Dashboard = ({ user }) => {
         <motion.div
             initial="hidden"
             animate="show"
-            variants={container}
-            className="space-y-8 pb-12"
+            variants={containerVariants}
+            className="space-y-12"
         >
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <motion.div variants={item}>
-                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
-                        System <span className="gradient-text">Dashboard</span>
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-text-main">
+                        Portal <span className="text-text-muted italic">overview</span>
                     </h1>
-                    <p className="text-slate-400 mt-2 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        Authenticated session for <strong className="text-white">{user.name}</strong> as <span className="text-indigo-400 font-bold uppercase text-xs px-2 py-0.5 bg-indigo-500/10 rounded-md border border-indigo-500/20">{user.role}</span>
+                    <p className="text-text-muted mt-2 font-medium">
+                        Secure session established for <span className="text-text-main font-bold">{user.name}</span>
                     </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                    variants={item}
-                    className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl"
-                >
-                    <div className="bg-emerald-500/20 p-2 rounded-xl text-emerald-500">
-                        <Zap size={20} fill="currentColor" />
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Health</p>
-                        <p className="text-sm font-bold text-emerald-400">All Nodes Secure</p>
-                    </div>
-                </motion.div>
+                <div className="flex items-center gap-4">
+                    {user.role === 'Faculty' && (
+                        <Link to="/create-exam" className="btn-primary">
+                            <Plus size={18} className="mr-2" />
+                            Provision Module
+                        </Link>
+                    )}
+                    {(user.role === 'Admin' || user.role === 'Faculty') && (
+                        <Link to="/results" className="btn-secondary">
+                            <BarChart3 size={18} className="mr-2" />
+                            Analytics
+                        </Link>
+                    )}
+                </div>
             </header>
 
-            <motion.div
-                variants={container}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-                <motion.div variants={item} className="glass p-6 md:p-8 border-indigo-500/20 group hover:border-indigo-500/40 transition-all cursor-default relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-                        <BookOpen size={100} />
-                    </div>
-                    <div className="flex justify-between items-start mb-6">
-                        <div className="bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all">
-                            <BookOpen className="text-indigo-400" size={28} />
-                        </div>
-                        <div className="flex items-center gap-1 text-emerald-400 font-bold text-sm bg-emerald-500/10 px-2 py-1 rounded-lg">
-                            <ArrowUpRight size={14} />
-                            +2
-                        </div>
-                    </div>
-                    <p className="text-4xl font-bold text-white mb-2">12</p>
-                    <h3 className="text-lg font-bold text-slate-300">Active Exams</h3>
-                    <p className="text-slate-500 text-sm mt-2 leading-relaxed">Secure assessments available for immediate completion.</p>
-                </motion.div>
+            {/* Top Stats - Dynamic labels based on identity role */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <StatCard
+                    title={user.role === 'Student' ? "Tests Available" : "Active Modules"}
+                    value={stats.activeExams}
+                    icon={<BookOpen size={24} />}
+                    trend={user.role === 'Student' ? "Current" : "+12%"}
+                    color="coral"
+                    isLoading={isLoading}
+                />
+                <StatCard
+                    title={user.role === 'Student' ? "My Average" : "Mean Performance"}
+                    value={stats.meanScore}
+                    icon={<Activity size={24} />}
+                    trend={user.role === 'Student' ? "Aggregated" : "+8%"}
+                    color="mint"
+                    isLoading={isLoading}
+                />
+                <StatCard
+                    title={user.role === 'Student' ? "Tests Taken" : "System Nodes"}
+                    value={stats.activeUsers}
+                    icon={<Users size={24} />}
+                    trend={user.role === 'Student' ? "Completed" : "+2"}
+                    color="dark"
+                    isLoading={isLoading}
+                />
+            </div>
 
-                <motion.div variants={item} className="glass p-6 md:p-8 border-emerald-500/20 group hover:border-emerald-500/40 transition-all cursor-default relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-                        <CheckCircle size={100} />
-                    </div>
-                    <div className="flex justify-between items-start mb-6">
-                        <div className="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
-                            <CheckCircle className="text-emerald-400" size={28} />
-                        </div>
-                        <div className="flex items-center gap-1 text-emerald-400 font-bold text-sm bg-emerald-500/10 px-2 py-1 rounded-lg">
-                            <ArrowUpRight size={14} />
-                            8%
-                        </div>
-                    </div>
-                    <p className="text-4xl font-bold text-white mb-2">85%</p>
-                    <h3 className="text-lg font-bold text-slate-300">Mean Score</h3>
-                    <p className="text-slate-500 text-sm mt-2 leading-relaxed">Performance delta across all verified department results.</p>
-                </motion.div>
-
-                <motion.div variants={item} className="glass p-6 md:p-8 border-amber-500/20 group hover:border-amber-500/40 transition-all cursor-default relative overflow-hidden lg:col-span-1 sm:col-span-2">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-                        <Clock size={100} />
-                    </div>
-                    <div className="flex justify-between items-start mb-6">
-                        <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all">
-                            <Clock className="text-amber-400" size={28} />
-                        </div>
-                    </div>
-                    <p className="text-4xl font-bold text-white mb-2">45m</p>
-                    <h3 className="text-lg font-bold text-slate-300">Avg. Duration</h3>
-                    <p className="text-slate-500 text-sm mt-2 leading-relaxed">Standard time for cryptographic result evaluation cycle.</p>
-                </motion.div>
-            </motion.div>
-
-            <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 glass p-6 md:p-10 relative overflow-hidden border-white/5">
-                    <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none scale-150 transform rotate-12">
-                        <Shield size={200} />
-                    </div>
-
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-2xl font-bold flex items-center gap-3">
-                            <div className="bg-indigo-500/10 p-2 rounded-xl border border-indigo-500/20">
-                                <FileText className="text-indigo-400" size={22} />
-                            </div>
-                            Security Protocol Audit
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Product activity style list */}
+                <div className="lg:col-span-2 surface-card p-10">
+                    <div className="flex items-center justify-between mb-10">
+                        <h2 className="text-xl font-black tracking-tight flex items-center gap-3">
+                            {user.role === 'Student' ? 'Assessment' : 'Portal'} <span className="text-text-muted italic">activity</span>
                         </h2>
-                        <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest border border-white/10 px-3 py-1.5 rounded-lg">
-                            <Activity size={14} className="text-indigo-500" />
-                            Real-time Monitoring
+                        <span className="badge-mint">Live Monitoring</span>
+                    </div>
+
+                    <div className="space-y-6">
+                        {user.role === 'Student' ? (
+                            <>
+                                <div className="p-10 border-dashed border-2 border-black/5 rounded-[2rem] flex flex-col items-center justify-center text-center gap-6">
+                                    <div className="w-16 h-16 bg-sidebar-bg rounded-full flex items-center justify-center text-text-muted">
+                                        <Award size={32} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-black text-text-main italic uppercase tracking-tighter text-xl">Result Hub</h3>
+                                        <p className="text-text-muted text-sm mt-2 max-w-xs mx-auto">Your cryptographically signed performance ledger is available for review.</p>
+                                    </div>
+                                    <Link to="/results" className="btn-primary w-full max-w-[200px] h-12 text-[10px]">
+                                        View All Records <ArrowUpRight size={14} className="ml-2" />
+                                    </Link>
+                                </div>
+                            </>
+                        ) : (
+                            [
+                                { action: 'Identity Verification', details: 'NIST 800-63-2 MFA validated via protocol', time: 'Just now', color: 'mint' },
+                                { action: 'Digital Signature Integrity', details: 'Block ID #8812 - RSA integrity confirmed', time: '12m ago', color: 'coral' },
+                                { action: 'Middleware ACL Sync', details: 'Hierarchical permission granted for objects', time: '1h ago', color: 'dark' },
+                                { action: 'AES-256 Buffer Seal', details: 'Submission data symmetrically encrypted', time: '3h ago', color: 'mint' },
+                            ].map((log, i) => (
+                                <div key={i} className="flex items-center justify-between p-6 bg-sidebar-bg/50 rounded-3xl border border-transparent hover:border-black/5 hover:bg-white transition-all cursor-default group">
+                                    <div className="flex items-center gap-6">
+                                        <div className={`w-3 h-3 rounded-full ${log.color === 'coral' ? 'bg-accent-coral' : log.color === 'mint' ? 'bg-accent-mint' : 'bg-accent-dark'}`}></div>
+                                        <div>
+                                            <p className="font-bold text-text-main group-hover:translate-x-1 transition-transform">{log.action}</p>
+                                            <p className="text-xs text-text-muted mt-1">{log.details}</p>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-black text-text-muted uppercase tracking-widest">{log.time}</span>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* Right side Info Card */}
+                <div className="surface-card p-10 bg-accent-dark text-white flex flex-col justify-between overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none scale-150 transform rotate-12">
+                        <ShieldCheck size={200} />
+                    </div>
+
+                    <div className="relative z-10">
+                        <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-8 border border-white/10">
+                            <Shield size={28} className="text-accent-coral" />
+                        </div>
+                        <h3 className="text-2xl font-black italic tracking-tighter mb-4">Identity Assurance</h3>
+                        <p className="text-sm text-white/60 leading-relaxed font-medium">
+                            Your environment is currently participating in the Decentralized Academic Network under NIST Level 3 protocols.
+                        </p>
+                    </div>
+
+                    <div className="relative z-10 space-y-4">
+                        <div className="h-[1px] bg-white/10 w-full mb-6"></div>
+                        <div className="flex flex-col gap-3">
+                            <Link to="/audit" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+                                <Fingerprint size={14} /> Audit Node forensics
+                            </Link>
+                            {user.role === 'Admin' && (
+                                <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+                                    <Users size={14} /> Identity Registry
+                                </Link>
+                            )}
                         </div>
                     </div>
-
-                    <div className="space-y-4 relative">
-                        {[
-                            { action: 'Identity Verification Success', details: 'NIST 800-63-2 MFA validated via protocol', time: '2 mins ago', color: 'bg-indigo-500' },
-                            { action: 'Digital Signature Verified', details: 'Block ID #8812 - RSA integrity confirmed', time: '1 hour ago', color: 'bg-emerald-500' },
-                            { action: 'Middleware ACL Check', details: 'Hierarchical permission granted for objects', time: '3 hours ago', color: 'bg-indigo-500' },
-                            { action: 'AES-256 Data Seal', details: 'Submission buffer encrypted symmetrically', time: '5 hours ago', color: 'bg-amber-500' },
-                        ].map((log, i) => (
-                            <motion.div
-                                key={i}
-                                whileHover={{ x: 5 }}
-                                className="flex items-center gap-5 p-4 bg-slate-800/20 rounded-2xl border border-white/5 hover:border-white/10 transition-all font-medium"
-                            >
-                                <div className={`w-3 h-3 rounded-full ${log.color} shadow-[0_0_10px_rgba(255,255,255,0.1)]`}></div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-slate-200 text-sm md:text-base truncate">{log.action}</p>
-                                    <p className="text-xs text-slate-500 truncate">{log.details}</p>
-                                </div>
-                                <span className="text-[10px] font-bold text-slate-600 uppercase whitespace-nowrap">{log.time}</span>
-                            </motion.div>
-                        ))}
-                    </div>
                 </div>
-
-                <div className="glass p-8 flex flex-col items-center justify-center text-center space-y-6 border-indigo-500/10 bg-gradient-to-br from-indigo-500/[0.05] to-transparent">
-                    <div className="bg-indigo-500/20 p-6 rounded-full border border-indigo-500/20 shadow-[0_0_50px_rgba(99,102,241,0.2)]">
-                        <Shield className="text-indigo-400" size={60} />
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold mb-2">NIST Shield active</h3>
-                        <p className="text-slate-500 text-sm max-w-[200px] leading-relaxed">All operations are currently protected by Level 3 Identity Assurance protocols.</p>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        <button className="text-xs font-bold text-indigo-400 uppercase tracking-widest hover:text-white transition-colors border-b border-indigo-500/30 pb-1">
-                            View Security Policy
-                        </button>
-                        {user.role === 'Admin' && (
-                            <Link to="/audit" className="text-xs font-bold text-emerald-400 uppercase tracking-widest hover:text-white transition-colors border-b border-emerald-500/30 pb-1 flex items-center gap-2">
-                                <Fingerprint size={14} />
-                                Access Forensic Node
-                            </Link>
-                        )}
-                        {user.role === 'Admin' && (
-                            <Link to="/users" className="text-xs font-bold text-indigo-400 uppercase tracking-widest hover:text-white transition-colors border-b border-indigo-500/30 pb-1 flex items-center gap-2">
-                                <Users size={14} />
-                                Identity Governance
-                            </Link>
-                        )}
-                    </div>
-                </div>
-            </motion.div>
+            </div>
         </motion.div>
     );
 };
+
+const StatCard = ({ title, value, icon, trend, color, isLoading }) => {
+    return (
+        <div className="surface-card p-10 group relative overflow-hidden flex items-end justify-between hover:-translate-y-1">
+            {/* Background icon inspired by image */}
+            <div className="absolute top-10 left-10 text-text-muted/10 group-hover:scale-110 group-hover:text-text-muted/20 transition-all duration-700">
+                {icon}
+            </div>
+
+            <div className="relative z-10">
+                <p className="text-sm font-bold text-text-muted mb-2 tracking-tight">{title}</p>
+                <div className="text-5xl font-black tracking-tighter text-text-main">
+                    {isLoading ? <span className="animate-pulse">...</span> : value}
+                </div>
+            </div>
+
+            <div className="relative z-10 flex flex-col items-end gap-4">
+                <div className={`badge-${color === 'coral' ? 'coral' : color === 'mint' ? 'mint' : 'dark'} flex items-center gap-1`}>
+                    <ArrowUpRight size={12} />
+                    {trend}
+                </div>
+                {/* Small abstract spark line representation inspired by image */}
+                <div className={`w-20 h-8 flex items-end gap-1 px-1`}>
+                    {[0.4, 0.7, 0.3, 0.9, 0.6, 1].map((h, i) => (
+                        <div
+                            key={i}
+                            style={{ height: `${h * 100}%` }}
+                            className={`flex-1 rounded-full ${color === 'coral' ? 'bg-accent-coral/20' : color === 'mint' ? 'bg-accent-mint/20' : 'bg-accent-dark/20'}`}
+                        ></div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default Dashboard;

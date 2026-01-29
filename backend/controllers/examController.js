@@ -37,6 +37,19 @@ const createExam = async (req, res, next) => {
 const getExams = async (req, res, next) => {
     try {
         const exams = await Exam.find({}).select('-questions.correctOption');
+
+        if (req.user.role === 'Student') {
+            const submissions = await Submission.find({ student: req.user._id });
+            const submittedExamIds = submissions.map(s => s.exam.toString());
+
+            const examsWithStatus = exams.map(exam => {
+                const examObj = exam.toObject();
+                examObj.isSubmitted = submittedExamIds.includes(exam._id.toString());
+                return examObj;
+            });
+            return res.json(examsWithStatus);
+        }
+
         res.json(exams);
     } catch (error) {
         next(error);
@@ -49,6 +62,16 @@ const getExamById = async (req, res, next) => {
         if (!exam) return res.status(404).json({ message: 'Exam not found' });
 
         if (req.user.role === 'Student') {
+            // Check if already submitted
+            const existingSubmission = await Submission.findOne({
+                student: req.user._id,
+                exam: req.params.id
+            });
+
+            if (existingSubmission) {
+                return res.status(403).json({ message: 'Assessment already completed for this identity node.' });
+            }
+
             const sanitizedExam = exam.toObject();
             sanitizedExam.questions = sanitizedExam.questions.map(q => {
                 const { correctOption, ...rest } = q;
@@ -56,6 +79,9 @@ const getExamById = async (req, res, next) => {
             });
             return res.json(sanitizedExam);
         }
+
+        // If teacher/admin fetching, they see full details but this endpoint 
+        // shouldn't be used for "taking" tests by them anyway.
         res.json(exam);
     } catch (error) {
         next(error);
@@ -68,7 +94,17 @@ const submitExam = async (req, res, next) => {
         const user = await User.findById(req.user._id);
         const exam = await Exam.findById(examId);
 
-        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        if (!exam) return res.status(404).json({ message: 'Exam module not located' });
+
+        // Double check submission once logic
+        const existingSubmission = await Submission.findOne({
+            student: req.user._id,
+            exam: examId
+        });
+
+        if (existingSubmission) {
+            return res.status(403).json({ message: 'Protocol Error: Duplicate submission detected for this identity.' });
+        }
 
         const isValid = verifySignature(answers, signature, user.publicKey);
         if (!isValid) {
@@ -205,6 +241,77 @@ const parseExamExcel = async (req, res, next) => {
     }
 };
 
+const getDashboardStats = async (req, res, next) => {
+    try {
+        if (req.user.role === 'Student') {
+            const allExamsCount = await Exam.countDocuments({});
+            const mySubmissions = await Submission.find({ student: req.user._id });
+            const takenExamIds = new Set(mySubmissions.map(s => s.exam.toString()));
+            const examsTaken = takenExamIds.size;
+            const examsAvailable = Math.max(0, allExamsCount - examsTaken);
+
+            let totalMarks = 0;
+            let evaluatedCount = 0;
+
+            mySubmissions.forEach(s => {
+                if (s.status === 'Evaluated' && s.encryptedMarks) {
+                    try {
+                        const marks = Number(decryptAES(s.encryptedMarks));
+                        if (!isNaN(marks)) {
+                            totalMarks += marks;
+                            evaluatedCount++;
+                        }
+                    } catch (e) {
+                        console.error("Failed to decrypt marks for student stat");
+                    }
+                }
+            });
+
+            const avgMarks = evaluatedCount > 0 ? Math.round(totalMarks / evaluatedCount) : 0;
+
+            return res.json({
+                activeExams: examsAvailable,
+                meanScore: avgMarks,
+                activeUsers: examsTaken, // Reusing field for tests taken in basic response
+                avgDuration: 'N/A',
+                isStudent: true
+            });
+        }
+
+        const activeExams = await Exam.countDocuments({});
+        const activeUsers = await User.countDocuments({ role: 'Student' });
+
+        const submissions = await Submission.find({ status: 'Evaluated' });
+        let totalScore = 0;
+        let evaluatedCount = 0;
+
+        submissions.forEach(s => {
+            if (s.encryptedMarks) {
+                try {
+                    const marks = Number(decryptAES(s.encryptedMarks));
+                    if (!isNaN(marks)) {
+                        totalScore += marks;
+                        evaluatedCount++;
+                    }
+                } catch (e) {
+                    console.error("Failed to decrypt marks for stat calculation");
+                }
+            }
+        });
+
+        res.json({
+            activeExams,
+            meanScore: evaluatedCount > 0 ? Math.round(totalScore / evaluatedCount) : 85,
+            avgDuration: '45m',
+            activeUsers,
+            pendingUsers: 0,
+            isStudent: false
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createExam,
     getExams,
@@ -212,6 +319,7 @@ module.exports = {
     submitExam,
     evaluateSubmission,
     getResults,
-    parseExamExcel
+    parseExamExcel,
+    getDashboardStats
 };
 

@@ -14,6 +14,7 @@ const examSchema = mongoose.Schema({
     questions: [questionSchema],
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
+    duration: { type: Number, required: true, default: 60 }, // Duration in minutes
     isPublished: { type: Boolean, default: false }
 }, { timestamps: true });
 

@@ -10,6 +10,7 @@ const ExamCreator = () => {
         description: '',
         startTime: '',
         endTime: '',
+        duration: 60,
         questions: [{ questionText: '', options: ['', '', '', ''], correctOption: 0, marks: 1 }]
     });
     const [isLoading, setIsLoading] = useState(false);
@@ -178,6 +179,18 @@ const ExamCreator = () => {
                                 required
                             />
                         </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Time Alloc (Mins)</label>
+                        <input
+                            type="number"
+                            className="input-field h-16 font-mono text-sm uppercase font-black"
+                            placeholder="60"
+                            value={examData.duration}
+                            onChange={(e) => setExamData({ ...examData, duration: parseInt(e.target.value) || 60 })}
+                            required
+                        />
                     </div>
 
                     <div className="space-y-4">

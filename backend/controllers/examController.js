@@ -11,13 +11,14 @@ const xlsx = require('xlsx');
  */
 const createExam = async (req, res, next) => {
     try {
-        const { title, description, questions, startTime, endTime } = req.body;
+        const { title, description, questions, startTime, endTime, duration } = req.body;
         const exam = await Exam.create({
             title,
             description,
             questions,
             startTime,
             endTime,
+            duration: duration || 60,
             createdBy: req.user._id
         });
 

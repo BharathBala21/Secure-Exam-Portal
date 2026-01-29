@@ -23,6 +23,7 @@ const userRoutes = require('./routes/userRoutes');
 const examRoutes = require('./routes/examRoutes');
 const auditRoutes = require('./routes/auditRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 // Connect to Database
 connectDB();
@@ -34,7 +35,7 @@ const app = express();
  * Security starts here with CORS and data parsing
  */
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:5177'],
     credentials: true
 }));
 app.use(express.json());
@@ -46,6 +47,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Root route
 app.get('/', (req, res) => {

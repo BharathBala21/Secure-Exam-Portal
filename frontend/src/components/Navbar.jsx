@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, LogOut, User as UserIcon, BookOpen, BarChart3, PlusCircle, Menu, X, Fingerprint, Users, Layout } from 'lucide-react';
+import { Shield, LogOut, User as UserIcon, BookOpen, BarChart3, PlusCircle, Menu, X, Fingerprint, Users, Layout, MessageSquare } from 'lucide-react';
 
 const Navbar = ({ user, logout }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +12,7 @@ const Navbar = ({ user, logout }) => {
         { to: "/dashboard", icon: <Layout size={18} />, label: "Dashboard" },
         { to: "/exams", icon: <BookOpen size={18} />, label: "Exams" },
         { to: "/results", icon: <BarChart3 size={18} />, label: "Records" },
+        { to: "/messages", icon: <MessageSquare size={18} />, label: "Comm" },
     ];
 
     if (user?.role === 'Faculty') {
@@ -45,8 +46,8 @@ const Navbar = ({ user, logout }) => {
                                 key={link.to}
                                 to={link.to}
                                 className={`px-5 py-2.5 rounded-xl transition-all flex items-center gap-2.5 text-xs font-black uppercase tracking-widest ${isActive(link.to)
-                                        ? 'bg-accent-dark text-white shadow-medium'
-                                        : 'text-text-muted hover:text-text-main hover:bg-page-bg'
+                                    ? 'bg-accent-dark text-white shadow-medium'
+                                    : 'text-text-muted hover:text-text-main hover:bg-page-bg'
                                     }`}
                             >
                                 {link.icon}
@@ -98,8 +99,8 @@ const Navbar = ({ user, logout }) => {
                                 to={link.to}
                                 onClick={() => setIsOpen(false)}
                                 className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${isActive(link.to)
-                                        ? 'bg-accent-dark text-white'
-                                        : 'bg-sidebar-bg text-text-muted hover:text-text-main'
+                                    ? 'bg-accent-dark text-white'
+                                    : 'bg-sidebar-bg text-text-muted hover:text-text-main'
                                     }`}
                             >
                                 {link.icon}

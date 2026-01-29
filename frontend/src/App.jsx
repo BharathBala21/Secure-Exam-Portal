@@ -11,6 +11,7 @@ import ExamCreator from './pages/ExamCreator';
 import Results from './pages/Results';
 import AuditLogs from './pages/AuditLogs';
 import UserManagement from './pages/UserManagement';
+import Messaging from './pages/Messaging';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -60,6 +61,7 @@ function App() {
                                 <Route path="/results" element={user ? <Results user={user} /> : <Navigate to="/login" />} />
                                 <Route path="/audit" element={user?.role === 'Admin' ? <AuditLogs user={user} /> : <Navigate to="/dashboard" />} />
                                 <Route path="/users" element={user?.role === 'Admin' ? <UserManagement user={user} /> : <Navigate to="/dashboard" />} />
+                                <Route path="/messages" element={user ? <Messaging user={user} /> : <Navigate to="/login" />} />
                             </Routes>
                         </motion.div>
                     </AnimatePresence>

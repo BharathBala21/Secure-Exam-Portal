@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Shield, BookOpen, Clock, FileText, CheckCircle,
     ArrowUpRight, Activity, Zap, Fingerprint, Users,
-    Layout, Plus, BarChart3, ShieldCheck, Award
+    Layout, Plus, BarChart3, ShieldCheck, Award, Megaphone
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -161,42 +161,107 @@ const Dashboard = ({ user }) => {
                     </div>
                 </div>
 
-                {/* Right side Info Card */}
-                <div className="surface-card p-10 bg-accent-dark text-white flex flex-col justify-between overflow-hidden relative">
-                    <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none scale-150 transform rotate-12">
-                        <ShieldCheck size={200} />
-                    </div>
+                {/* Secure Announcements Node */}
+                <div className="lg:col-span-1 space-y-8">
+                    <AnnouncementBlock user={user} />
 
-                    <div className="relative z-10">
-                        <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-8 border border-white/10">
-                            <Shield size={28} className="text-accent-coral" />
+                    {/* Right side Info Card */}
+                    <div className="surface-card p-10 bg-accent-dark text-white flex flex-col justify-between overflow-hidden relative">
+                        <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none scale-150 transform rotate-12">
+                            <ShieldCheck size={200} />
                         </div>
-                        <h3 className="text-2xl font-black italic tracking-tighter mb-4">Identity Assurance</h3>
-                        <p className="text-sm text-white/60 leading-relaxed font-medium">
-                            {user.role === 'Admin'
-                                ? "Administrative override active. You have full oversight of the cryptographic node network and identity registry."
-                                : "Your environment is currently participating in the Decentralized Academic Network under NIST Level 3 protocols."}
-                        </p>
-                    </div>
 
-                    <div className="relative z-10 space-y-4">
-                        <div className="h-[1px] bg-white/10 w-full mb-6"></div>
-                        <div className="flex flex-col gap-3">
-                            {(user.role === 'Admin' || user.role === 'Faculty') && (
-                                <Link to="/audit" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
-                                    <Fingerprint size={14} /> Audit Node forensics
-                                </Link>
-                            )}
-                            {user.role === 'Admin' && (
-                                <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
-                                    <Users size={14} /> Identity Registry
-                                </Link>
-                            )}
+                        <div className="relative z-10">
+                            <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-8 border border-white/10">
+                                <Shield size={28} className="text-accent-coral" />
+                            </div>
+                            <h3 className="text-2xl font-black italic tracking-tighter mb-4">Identity Assurance</h3>
+                            <p className="text-sm text-white/60 leading-relaxed font-medium">
+                                {user.role === 'Admin'
+                                    ? "Administrative override active. You have full oversight of the cryptographic node network and identity registry."
+                                    : "Your environment is currently participating in the Decentralized Academic Network under NIST Level 3 protocols."}
+                            </p>
+                        </div>
+
+                        <div className="relative z-10 space-y-4">
+                            <div className="h-[1px] bg-white/10 w-full mb-6"></div>
+                            <div className="flex flex-col gap-3">
+                                {(user.role === 'Admin' || user.role === 'Faculty') && (
+                                    <Link to="/audit" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+                                        <Fingerprint size={14} /> Audit Node forensics
+                                    </Link>
+                                )}
+                                {user.role === 'Admin' && (
+                                    <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
+                                        <Users size={14} /> Identity Registry
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </motion.div>
+    );
+};
+
+const AnnouncementBlock = ({ user }) => {
+    const [announcements, setAnnouncements] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAnnouncements = async () => {
+            try {
+                const config = { headers: { Authorization: `Bearer ${user.token}` } };
+                const { data } = await axios.get('/api/messages/inbox', config);
+                // Filter for broadcasts and take the last 3
+                const broadcasts = data.filter(m => m.isBroadcast).slice(0, 3);
+                setAnnouncements(broadcasts);
+            } catch (err) {
+                console.error('Failed to fetch announcements');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAnnouncements();
+    }, [user.token]);
+
+    return (
+        <div className="surface-card p-10 bg-white border-l-4 border-l-accent-coral">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
+                    <Megaphone size={18} className="text-accent-coral" /> Broadcast Protocol
+                </h3>
+                <Link to="/messages" className="text-[10px] font-black uppercase text-text-muted hover:text-text-main transition-colors">
+                    Station
+                </Link>
+            </div>
+
+            {loading ? (
+                <div className="animate-pulse space-y-4">
+                    <div className="h-12 bg-sidebar-bg rounded-2xl"></div>
+                    <div className="h-12 bg-sidebar-bg rounded-2xl"></div>
+                </div>
+            ) : announcements.length > 0 ? (
+                <div className="space-y-6">
+                    {announcements.map((ann, i) => (
+                        <div key={ann._id} className="relative pl-6 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-accent-coral/30 before:rounded-full">
+                            <p className="text-xs font-bold text-text-main line-clamp-2 leading-relaxed">
+                                {ann.content}
+                            </p>
+                            <div className="flex items-center justify-between mt-2">
+                                <span className="text-[9px] font-black text-text-muted uppercase tracking-widest">{ann.sender.name}</span>
+                                <span className="text-[9px] text-text-muted/60">{new Date(ann.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="py-6 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-text-muted italic opacity-40">No active dispatches</p>
+                </div>
+            )}
+        </div>
     );
 };
 

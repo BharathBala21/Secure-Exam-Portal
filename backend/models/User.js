@@ -16,6 +16,8 @@ const userSchema = mongoose.Schema({
     otpExpires: { type: Date },
     publicKey: { type: String }, // RSA Public Key for signatures/exchange
     privateKey: { type: String }, // NOTE: Storing private key is generally insecure, but here for demonstration of key management
+    rollNumber: { type: String },
+    isApproved: { type: Boolean, default: false },
 }, { timestamps: true });
 
 // Password hashing middleware

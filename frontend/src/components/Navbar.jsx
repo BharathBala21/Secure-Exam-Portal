@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, LogOut, User as UserIcon, BookOpen, BarChart3, PlusCircle, Menu, X } from 'lucide-react';
+import { Shield, LogOut, User as UserIcon, BookOpen, BarChart3, PlusCircle, Menu, X, Fingerprint, Users } from 'lucide-react';
 
 const Navbar = ({ user, logout }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +15,11 @@ const Navbar = ({ user, logout }) => {
 
     if (user?.role === 'Faculty') {
         navLinks.splice(2, 0, { to: "/create-exam", icon: <PlusCircle size={18} />, label: "Create" });
+    }
+
+    if (user?.role === 'Admin') {
+        navLinks.push({ to: "/users", icon: <Users size={18} />, label: "Users" });
+        navLinks.push({ to: "/audit", icon: <Fingerprint size={18} />, label: "Audit" });
     }
 
     return (

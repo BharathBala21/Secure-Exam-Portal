@@ -1,6 +1,7 @@
 import React from 'react';
-import { Shield, BookOpen, Clock, FileText, CheckCircle, ArrowUpRight, Activity, Zap } from 'lucide-react';
+import { Shield, BookOpen, Clock, FileText, CheckCircle, ArrowUpRight, Activity, Zap, Fingerprint, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Dashboard = ({ user }) => {
     const container = {
@@ -155,9 +156,23 @@ const Dashboard = ({ user }) => {
                         <h3 className="text-xl font-bold mb-2">NIST Shield active</h3>
                         <p className="text-slate-500 text-sm max-w-[200px] leading-relaxed">All operations are currently protected by Level 3 Identity Assurance protocols.</p>
                     </div>
-                    <button className="text-xs font-bold text-indigo-400 uppercase tracking-widest hover:text-white transition-colors border-b border-indigo-500/30 pb-1">
-                        View Security Policy
-                    </button>
+                    <div className="flex flex-col gap-3">
+                        <button className="text-xs font-bold text-indigo-400 uppercase tracking-widest hover:text-white transition-colors border-b border-indigo-500/30 pb-1">
+                            View Security Policy
+                        </button>
+                        {user.role === 'Admin' && (
+                            <Link to="/audit" className="text-xs font-bold text-emerald-400 uppercase tracking-widest hover:text-white transition-colors border-b border-emerald-500/30 pb-1 flex items-center gap-2">
+                                <Fingerprint size={14} />
+                                Access Forensic Node
+                            </Link>
+                        )}
+                        {user.role === 'Admin' && (
+                            <Link to="/users" className="text-xs font-bold text-indigo-400 uppercase tracking-widest hover:text-white transition-colors border-b border-indigo-500/30 pb-1 flex items-center gap-2">
+                                <Users size={14} />
+                                Identity Governance
+                            </Link>
+                        )}
+                    </div>
                 </div>
             </motion.div>
         </motion.div>

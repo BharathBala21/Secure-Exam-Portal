@@ -2,6 +2,7 @@ const Exam = require('../models/Exam');
 const Submission = require('../models/Submission');
 const User = require('../models/User');
 const { encryptAES, decryptAES, verifySignature } = require('../utils/security');
+const { createAuditLog } = require('../utils/auditLogger');
 
 /**
  * Create Exam (Faculty only)
@@ -17,6 +18,15 @@ const createExam = async (req, res, next) => {
             endTime,
             createdBy: req.user._id
         });
+
+        await createAuditLog({
+            action: 'Exam Module Created',
+            user: req.user,
+            details: `New assessment "${title}" initialized in the secure node.`,
+            resourceId: exam._id,
+            ipAddress: req.ip
+        });
+
         res.status(201).json(exam);
     } catch (error) {
         next(error);
@@ -61,6 +71,14 @@ const submitExam = async (req, res, next) => {
 
         const isValid = verifySignature(answers, signature, user.publicKey);
         if (!isValid) {
+            await createAuditLog({
+                action: 'Signature Verification Failure',
+                user: req.user,
+                details: `Integrity check failed for Exam ID: ${examId}. Possible tampering detected.`,
+                status: 'Failure',
+                resourceId: examId,
+                ipAddress: req.ip
+            });
             return res.status(400).json({ message: 'Digital signature verification failed. Integrity compromised.' });
         }
 
@@ -72,6 +90,14 @@ const submitExam = async (req, res, next) => {
             encryptedAnswers,
             signature,
             status: 'Submitted'
+        });
+
+        await createAuditLog({
+            action: 'Assessment Submission',
+            user: req.user,
+            details: `Student submitted and signed exam "${exam.title}". AES buffer sealed.`,
+            resourceId: submission._id,
+            ipAddress: req.ip
         });
 
         res.status(201).json({ message: 'Exam submitted successfully', submissionId: submission._id });
@@ -98,6 +124,14 @@ const evaluateSubmission = async (req, res, next) => {
         submission.encryptedMarks = encryptAES(marks.toString());
         submission.status = 'Evaluated';
         await submission.save();
+
+        await createAuditLog({
+            action: 'Submission Evaluated',
+            user: req.user,
+            details: `Marks generated and encrypted for submission ${submission._id}.`,
+            resourceId: submission._id,
+            ipAddress: req.ip
+        });
 
         res.json({ message: 'Evaluation complete' });
     } catch (error) {

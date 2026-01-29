@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User, Briefcase, ChevronRight, Copy, Check, Shield } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Briefcase, ChevronRight, Copy, Check, Shield, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Register = () => {
@@ -9,7 +9,8 @@ const Register = () => {
         name: '',
         email: '',
         password: '',
-        role: 'Student'
+        role: 'Student',
+        rollNumber: ''
     });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +54,12 @@ const Register = () => {
                             </div>
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Security Keys Generated</h1>
                             <p className="text-slate-400">Your profile has been provisioned with NIST-compliant asymmetric keys.</p>
+                            {registeredData.role === 'Student' && (
+                                <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-500 text-sm font-bold flex items-center justify-center gap-2">
+                                    <Shield className="w-4 h-4" />
+                                    Account pending Admin approval. Access will be granted shortly.
+                                </div>
+                            )}
                         </div>
 
                         <div className="space-y-6">
@@ -160,18 +167,35 @@ const Register = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Official Email</label>
-                            <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
-                                <input
-                                    type="email"
-                                    className="input-field pl-12 h-12 bg-white/5 border-white/10"
-                                    placeholder="jane.doe@univ.edu"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    required
-                                />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Official Email</label>
+                                <div className="relative group">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                                    <input
+                                        type="email"
+                                        className="input-field pl-12 h-12 bg-white/5 border-white/10"
+                                        placeholder="jane.doe@univ.edu"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Roll / ID Number</label>
+                                <div className="relative group">
+                                    <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                                    <input
+                                        type="text"
+                                        className="input-field pl-12 h-12 bg-white/5 border-white/10"
+                                        placeholder="ROLL-2024-001"
+                                        value={formData.rollNumber}
+                                        onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
+                                        required={formData.role === 'Student'}
+                                    />
+                                </div>
                             </div>
                         </div>
 

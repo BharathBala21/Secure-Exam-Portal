@@ -21,6 +21,8 @@ const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const examRoutes = require('./routes/examRoutes');
+const auditRoutes = require('./routes/auditRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Connect to Database
 connectDB();
@@ -42,6 +44,8 @@ app.use(cookieParser());
 // Role-Based API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/audit', auditRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root route
 app.get('/', (req, res) => {

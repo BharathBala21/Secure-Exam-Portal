@@ -9,6 +9,8 @@ import ExamList from './pages/ExamList';
 import ExamTaker from './pages/ExamTaker';
 import ExamCreator from './pages/ExamCreator';
 import Results from './pages/Results';
+import AuditLogs from './pages/AuditLogs';
+import UserManagement from './pages/UserManagement';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -59,6 +61,8 @@ function App() {
                                 <Route path="/exams/:id" element={user ? <ExamTaker user={user} /> : <Navigate to="/login" />} />
                                 <Route path="/create-exam" element={user?.role === 'Faculty' ? <ExamCreator /> : <Navigate to="/dashboard" />} />
                                 <Route path="/results" element={user ? <Results user={user} /> : <Navigate to="/login" />} />
+                                <Route path="/audit" element={user?.role === 'Admin' ? <AuditLogs user={user} /> : <Navigate to="/dashboard" />} />
+                                <Route path="/users" element={user?.role === 'Admin' ? <UserManagement user={user} /> : <Navigate to="/dashboard" />} />
                             </Routes>
                         </motion.div>
                     </AnimatePresence>

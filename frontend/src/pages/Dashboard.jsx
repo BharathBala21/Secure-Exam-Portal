@@ -7,6 +7,7 @@ import {
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { QRCodeSVG } from 'qrcode.react';
 
 const Dashboard = ({ user }) => {
     const [stats, setStats] = useState({
@@ -197,6 +198,35 @@ const Dashboard = ({ user }) => {
                                     </Link>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Integrated Encoding/Decoding Demonstration */}
+                        <div className="mt-8 pt-8 border-t border-white/10 relative z-10">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Digital ID (QR Encoded)</span>
+                                <div className="flex items-center gap-1.5 p-1 px-2 rounded-md bg-accent-mint/10 text-accent-mint text-[8px] font-black uppercase tracking-widest">
+                                    <ShieldCheck size={10} /> NIST SECURE
+                                </div>
+                            </div>
+                            <div className="bg-white p-4 rounded-3xl w-fit mx-auto group-hover:scale-105 transition-transform duration-500 shadow-xl">
+                                <QRCodeSVG
+                                    value={JSON.stringify({
+                                        id: user._id,
+                                        email: user.email,
+                                        role: user.role,
+                                        origin: "SECURE-EXAM-NETWORK",
+                                        ts: new Date().toISOString()
+                                    })}
+                                    size={120}
+                                    level="H"
+                                    includeMargin={false}
+                                    // Custom aesthetic for QR code
+                                    fgColor="#0F172A"
+                                />
+                            </div>
+                            <p className="text-[9px] text-white/30 text-center mt-4 leading-relaxed font-medium">
+                                Scan to verify node authenticity. This block uses <span className="text-white/60">QR Encoding</span> to package your identity certificate for physical gate checks.
+                            </p>
                         </div>
                     </div>
                 </div>

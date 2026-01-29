@@ -232,15 +232,28 @@ const ExamCreator = () => {
                                     </button>
 
                                     <div className="space-y-10">
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] ml-1">Problem Statement</label>
-                                            <input
-                                                className="input-field bg-white border border-black/5 h-20 text-2xl font-black tracking-tighter px-10 placeholder:text-black/10"
-                                                placeholder="Define objective logic..."
-                                                value={q.questionText}
-                                                onChange={(e) => updateQuestion(qIdx, 'questionText', e.target.value)}
-                                                required
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                            <div className="md:col-span-9 space-y-4">
+                                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] ml-1">Problem Statement</label>
+                                                <input
+                                                    className="input-field bg-white border border-black/5 h-20 text-2xl font-black tracking-tighter px-10 placeholder:text-black/10"
+                                                    placeholder="Define objective logic..."
+                                                    value={q.questionText}
+                                                    onChange={(e) => updateQuestion(qIdx, 'questionText', e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="md:col-span-3 space-y-4">
+                                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] ml-1">Credits</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    className="input-field bg-white border border-black/5 h-20 text-2xl font-black tracking-tighter text-center placeholder:text-black/10"
+                                                    value={q.marks}
+                                                    onChange={(e) => updateQuestion(qIdx, 'marks', parseInt(e.target.value) || 1)}
+                                                    required
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

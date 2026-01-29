@@ -31,7 +31,7 @@ const registerUser = async (req, res, next) => {
             password,
             role: role || 'Student',
             rollNumber,
-            isApproved: (role === 'Admin' || role === 'Faculty') ? true : false,
+            isApproved: (role === 'Admin') ? true : false,
             publicKey,
             privateKey
         });

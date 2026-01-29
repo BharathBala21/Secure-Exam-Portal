@@ -38,11 +38,11 @@ const AuditLogs = ({ user }) => {
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div>
                     <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-text-main italic uppercase">
-                        Forensic <span className="text-text-muted">Node</span>
+                        Audit <span className="text-text-muted">Logs</span>
                     </h1>
                     <p className="text-text-muted mt-2 font-medium flex items-center gap-2">
                         <Fingerprint className="text-accent-coral" size={18} />
-                        Immutable state ledger providing end-to-end cryptographic visibility
+                        Immutable record of all system and exam activities
                     </p>
                 </div>
 
@@ -122,7 +122,7 @@ const AuditLogs = ({ user }) => {
                                         </div>
 
                                         <div className="lg:text-right flex flex-col lg:items-end gap-2 border-l border-black/5 pl-10 h-full justify-center">
-                                            <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Global Timestamp</p>
+                                            <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Event Timestamp</p>
                                             <p className="text-2xl font-mono font-black text-text-main tracking-tighter">{new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
                                             <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">{new Date(log.createdAt).toLocaleDateString()}</p>
                                         </div>
@@ -169,7 +169,7 @@ const ForensicEncodingTool = () => {
     return (
         <div className="surface-card p-10 bg-white border-t-4 border-t-accent-mint">
             <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 mb-8">
-                <RefreshCcw size={18} className="text-accent-mint" /> Forensic Decoder
+                <RefreshCcw size={18} className="text-accent-mint" /> Log Decoder
             </h3>
 
             <div className="space-y-6">

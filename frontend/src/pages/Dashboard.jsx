@@ -57,7 +57,7 @@ const Dashboard = ({ user }) => {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-text-main">
-                        Portal <span className="text-text-muted italic">overview</span>
+                        Exam <span className="text-text-muted italic">Dashboard</span>
                     </h1>
                     <p className="text-text-muted mt-2 font-medium">
                         Secure session established for <span className="text-text-main font-bold">{user.name}</span>
@@ -68,7 +68,7 @@ const Dashboard = ({ user }) => {
                     {user.role === 'Faculty' && (
                         <Link to="/create-exam" className="btn-primary">
                             <Plus size={18} className="mr-2" />
-                            Provision Module
+                            Create Exam
                         </Link>
                     )}
                     {(user.role === 'Admin' || user.role === 'Faculty') && (
@@ -83,15 +83,15 @@ const Dashboard = ({ user }) => {
             {/* Top Stats - Dynamic labels based on identity role */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <StatCard
-                    title={user.role === 'Admin' ? "Total Identities" : (user.role === 'Student' ? "Tests Available" : "Active Modules")}
+                    title={user.role === 'Admin' ? "Total Users" : (user.role === 'Student' ? "Exams Available" : "Active Exams")}
                     value={user.role === 'Admin' ? stats.totalUsers : stats.activeExams}
                     icon={<Users size={24} />}
-                    trend={user.role === 'Admin' ? "Verified Nodes" : (user.role === 'Student' ? "Current" : "+12%")}
+                    trend={user.role === 'Admin' ? "Registered" : (user.role === 'Student' ? "Current" : "+12%")}
                     color={user.role === 'Admin' ? "dark" : "coral"}
                     isLoading={isLoading}
                 />
                 <StatCard
-                    title={user.role === 'Admin' ? "Forensic Logs" : (user.role === 'Student' ? "My Average" : "Mean Performance")}
+                    title={user.role === 'Admin' ? "Audit Logs" : (user.role === 'Student' ? "My Average" : "Mean Performance")}
                     value={user.role === 'Admin' ? stats.totalAudits : stats.meanScore}
                     icon={<Fingerprint size={24} />}
                     trend={user.role === 'Admin' ? "Synchronized" : (user.role === 'Student' ? "Aggregated" : "+8%")}
@@ -99,10 +99,10 @@ const Dashboard = ({ user }) => {
                     isLoading={isLoading}
                 />
                 <StatCard
-                    title={user.role === 'Admin' ? "Pending Actions" : (user.role === 'Student' ? "Tests Taken" : "System Nodes")}
+                    title={user.role === 'Admin' ? "Pending Approvals" : (user.role === 'Student' ? "Exams Taken" : "System Users")}
                     value={user.role === 'Admin' ? stats.pendingUsers : stats.activeUsers}
                     icon={<ShieldCheck size={24} />}
-                    trend={user.role === 'Admin' ? "Requires Handshake" : (user.role === 'Student' ? "Completed" : "+2")}
+                    trend={user.role === 'Admin' ? "Review Needed" : (user.role === 'Student' ? "Completed" : "+2")}
                     color="coral"
                     isLoading={isLoading}
                 />
@@ -113,11 +113,11 @@ const Dashboard = ({ user }) => {
                 <div className="lg:col-span-2 surface-card p-10">
                     <div className="flex items-center justify-between mb-10">
                         <h2 className="text-xl font-black tracking-tight flex items-center gap-3">
-                            {user.role === 'Student' ? 'Assessment' : (user.role === 'Admin' ? 'Identity' : 'Portal')} <span className="text-text-muted italic">{user.role === 'Admin' ? 'control' : 'activity'}</span>
+                            {user.role === 'Student' ? 'Assessment' : (user.role === 'Admin' ? 'Management' : 'Portal')} <span className="text-text-muted italic">activity</span>
                         </h2>
                         {user.role === 'Admin' ? (
                             <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-text-main flex items-center gap-2">
-                                Full Registry <ArrowUpRight size={14} />
+                                Manage Users <ArrowUpRight size={14} />
                             </Link>
                         ) : (
                             <span className="badge-mint">Live Monitoring</span>
@@ -176,11 +176,11 @@ const Dashboard = ({ user }) => {
                             <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-8 border border-white/10">
                                 <Shield size={28} className="text-accent-coral" />
                             </div>
-                            <h3 className="text-2xl font-black italic tracking-tighter mb-4">Identity Assurance</h3>
+                            <h3 className="text-2xl font-black italic tracking-tighter mb-4">Security Status</h3>
                             <p className="text-sm text-white/60 leading-relaxed font-medium">
                                 {user.role === 'Admin'
-                                    ? "Administrative override active. You have full oversight of the cryptographic node network and identity registry."
-                                    : "Your environment is currently participating in the Decentralized Academic Network under NIST Level 3 protocols."}
+                                    ? "Administrative override active. Full oversight of the secure exam network and user archives is enabled."
+                                    : "Your session is secured with NIST Level 3 protocols for a tamper-proof exam environment."}
                             </p>
                         </div>
 
@@ -189,45 +189,17 @@ const Dashboard = ({ user }) => {
                             <div className="flex flex-col gap-3">
                                 {(user.role === 'Admin' || user.role === 'Faculty') && (
                                     <Link to="/audit" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
-                                        <Fingerprint size={14} /> Audit Node forensics
+                                        <Fingerprint size={14} /> View Audit Logs
                                     </Link>
                                 )}
                                 {user.role === 'Admin' && (
                                     <Link to="/users" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors flex items-center gap-2">
-                                        <Users size={14} /> Identity Registry
+                                        <Users size={14} /> User Management
                                     </Link>
                                 )}
                             </div>
                         </div>
 
-                        {/* Integrated Encoding/Decoding Demonstration */}
-                        <div className="mt-8 pt-8 border-t border-white/10 relative z-10">
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Digital ID (QR Encoded)</span>
-                                <div className="flex items-center gap-1.5 p-1 px-2 rounded-md bg-accent-mint/10 text-accent-mint text-[8px] font-black uppercase tracking-widest">
-                                    <ShieldCheck size={10} /> NIST SECURE
-                                </div>
-                            </div>
-                            <div className="bg-white p-4 rounded-3xl w-fit mx-auto group-hover:scale-105 transition-transform duration-500 shadow-xl">
-                                <QRCodeSVG
-                                    value={JSON.stringify({
-                                        id: user._id,
-                                        email: user.email,
-                                        role: user.role,
-                                        origin: "SECURE-EXAM-NETWORK",
-                                        ts: new Date().toISOString()
-                                    })}
-                                    size={120}
-                                    level="H"
-                                    includeMargin={false}
-                                    // Custom aesthetic for QR code
-                                    fgColor="#0F172A"
-                                />
-                            </div>
-                            <p className="text-[9px] text-white/30 text-center mt-4 leading-relaxed font-medium">
-                                Scan to verify node authenticity. This block uses <span className="text-white/60">QR Encoding</span> to package your identity certificate for physical gate checks.
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -260,10 +232,10 @@ const AnnouncementBlock = ({ user }) => {
         <div className="surface-card p-10 bg-white border-l-4 border-l-accent-coral">
             <div className="flex items-center justify-between mb-8">
                 <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
-                    <Megaphone size={18} className="text-accent-coral" /> Broadcast Protocol
+                    <Megaphone size={18} className="text-accent-coral" /> Announcements
                 </h3>
                 <Link to="/messages" className="text-[10px] font-black uppercase text-text-muted hover:text-text-main transition-colors">
-                    Station
+                    Inbox
                 </Link>
             </div>
 
@@ -288,7 +260,7 @@ const AnnouncementBlock = ({ user }) => {
                 </div>
             ) : (
                 <div className="py-6 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-text-muted italic opacity-40">No active dispatches</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-text-muted italic opacity-40">No active announcements</p>
                 </div>
             )}
         </div>
@@ -349,7 +321,7 @@ const AdminUserQuickControl = ({ user }) => {
                             <button
                                 onClick={() => removeUser(u._id)}
                                 className="p-2 text-text-muted hover:text-accent-coral transition-colors opacity-0 group-hover:opacity-100"
-                                title="Purge Identity"
+                                title="Remove User"
                             >
                                 <Shield size={16} />
                             </button>

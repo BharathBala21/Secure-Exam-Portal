@@ -11,8 +11,8 @@ const Navbar = ({ user, logout }) => {
     const navLinks = [
         { to: "/dashboard", icon: <Layout size={18} />, label: "Dashboard" },
         { to: "/exams", icon: <BookOpen size={18} />, label: "Exams" },
-        { to: "/results", icon: <BarChart3 size={18} />, label: "Records" },
-        { to: "/messages", icon: <MessageSquare size={18} />, label: "Comm" },
+        { to: "/results", icon: <BarChart3 size={18} />, label: "Results" },
+        { to: "/messages", icon: <MessageSquare size={18} />, label: "Messages" },
     ];
 
     if (user?.role === 'Faculty') {
@@ -20,8 +20,8 @@ const Navbar = ({ user, logout }) => {
     }
 
     if (user?.role === 'Admin') {
-        navLinks.push({ to: "/users", icon: <Users size={18} />, label: "Registry" });
-        navLinks.push({ to: "/audit", icon: <Fingerprint size={18} />, label: "Forensics" });
+        navLinks.push({ to: "/users", icon: <Users size={18} />, label: "Users" });
+        navLinks.push({ to: "/audit", icon: <Fingerprint size={18} />, label: "Audit" });
     }
 
     const isActive = (path) => location.pathname === path;
@@ -34,7 +34,7 @@ const Navbar = ({ user, logout }) => {
                         <Shield className="text-white w-6 h-6" />
                     </div>
                     <span className="text-xl font-black italic tracking-tighter text-text-main hidden sm:block">
-                        SECURE<span className="text-text-muted font-light">NODE</span>
+                        EXAM<span className="text-text-muted font-light">PORTAL</span>
                     </span>
                 </Link>
 
@@ -62,13 +62,13 @@ const Navbar = ({ user, logout }) => {
                     {user ? (
                         <div className="flex items-center gap-4">
                             <span className="badge-coral items-center gap-2 hidden lg:flex">
-                                <div className="w-1.5 h-1.5 bg-accent-coral rounded-full animate-pulse"></div>
-                                {user.role} Identity
+                                <div className="w-1.5 h-1.5 bg-accent-mint rounded-full animate-pulse"></div>
+                                {user.role} Account
                             </span>
                             <button
                                 onClick={logout}
                                 className="w-12 h-12 flex items-center justify-center rounded-xl bg-sidebar-bg text-text-muted hover:bg-accent-coral/10 hover:text-accent-coral transition-all"
-                                title="End Session"
+                                title="Logout"
                             >
                                 <LogOut size={20} />
                             </button>
@@ -76,7 +76,7 @@ const Navbar = ({ user, logout }) => {
                     ) : (
                         <div className="flex items-center gap-4">
                             <Link to="/login" className="text-xs font-black uppercase tracking-widest text-text-muted hover:text-text-main py-2 px-4 transition-colors">Login</Link>
-                            <Link to="/register" className="btn-primary py-2.5 px-6">Join Network</Link>
+                            <Link to="/register" className="btn-primary py-2.5 px-6">Sign Up</Link>
                         </div>
                     )}
 
@@ -109,12 +109,12 @@ const Navbar = ({ user, logout }) => {
                         ))}
                     </div>
                     <div className="pt-6 border-t border-black/5 flex items-center justify-between">
-                        <span className="badge-coral">{user.role} IDENTITY</span>
+                        <span className="badge-mint">{user.role} ACCOUNT</span>
                         <button
                             onClick={() => { logout(); setIsOpen(false); }}
                             className="flex items-center gap-2 font-black uppercase tracking-widest text-xs text-accent-coral"
                         >
-                            <LogOut size={18} /> End Session
+                            <LogOut size={18} /> Logout
                         </button>
                     </div>
                 </div>

@@ -46,6 +46,17 @@ const getExams = async (req, res, next) => {
             const examsWithStatus = exams.map(exam => {
                 const examObj = exam.toObject();
                 examObj.isSubmitted = submittedExamIds.includes(exam._id.toString());
+
+                // Add an encrypted access token for the QR code
+                // This represents the "Exam Instance Verification" token
+                const accessPacket = JSON.stringify({
+                    examId: exam._id,
+                    studentId: req.user._id,
+                    ts: new Date().toISOString(),
+                    node: 'SECURE_EXAM_NODE_ALPHA'
+                });
+                examObj.qrAccessToken = encryptAES(accessPacket);
+
                 return examObj;
             });
             return res.json(examsWithStatus);

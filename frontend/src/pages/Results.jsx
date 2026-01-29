@@ -55,9 +55,9 @@ const Results = ({ user }) => {
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div>
                     <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-text-main italic uppercase">
-                        Security <span className="text-text-muted">Ledger</span>
+                        Exam <span className="text-text-muted">Results</span>
                     </h1>
-                    <p className="text-text-muted mt-2 font-medium">Verified assessment records with asymmetric signing certificates</p>
+                    <p className="text-text-muted mt-2 font-medium">Review and manage student performance records</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -65,7 +65,7 @@ const Results = ({ user }) => {
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-text-main transition-colors" size={18} />
                         <input
                             type="text"
-                            placeholder="Search identity or module..."
+                            placeholder="Search student or exam..."
                             className="input-field pl-14 h-14"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -85,11 +85,11 @@ const Results = ({ user }) => {
                     <table className="w-full text-left min-w-[1000px]">
                         <thead>
                             <tr className="border-b border-black/5 bg-sidebar-bg/50">
-                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Submitting Identity</th>
-                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Assessment Module</th>
-                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted text-center">Protocol Status</th>
-                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted text-center">Performance</th>
-                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Assurance</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Student Name</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Exam Title</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted text-center">Status</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted text-center">Score</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted">Verification</th>
                                 {user.role !== 'Student' && <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-muted text-right">Actions</th>}
                             </tr>
                         </thead>
@@ -100,14 +100,14 @@ const Results = ({ user }) => {
                                         <td colSpan="6" className="px-10 py-32 text-center">
                                             <div className="flex flex-col items-center gap-4">
                                                 <Loader2 className="animate-spin text-text-main" size={40} />
-                                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Accessing encrypted archives...</p>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">Loading results...</p>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : filteredResults.length === 0 ? (
                                     <tr>
                                         <td colSpan="6" className="px-10 py-32 text-center">
-                                            <div className="text-text-muted font-medium italic">No matching records detected in the secure vault.</div>
+                                            <div className="text-text-muted font-medium italic">No results found.</div>
                                         </td>
                                     </tr>
                                 ) : (
@@ -125,7 +125,7 @@ const Results = ({ user }) => {
                                                         <UserIcon size={20} />
                                                     </div>
                                                     <div>
-                                                        <p className="font-black text-text-main tracking-tight uppercase italic">{res.student?.name || 'Identity Masked'}</p>
+                                                        <p className="font-black text-text-main tracking-tighter uppercase italic">{res.student?.name || 'Unknown Student'}</p>
                                                         <p className="text-[10px] text-text-muted font-black uppercase tracking-widest mt-1">{res.student?.email || 'id-buffer-000'}</p>
                                                     </div>
                                                 </div>
@@ -133,7 +133,7 @@ const Results = ({ user }) => {
                                             <td className="px-10 py-8">
                                                 <div className="flex items-center gap-3">
                                                     <Book size={16} className="text-accent-coral" />
-                                                    <span className="font-black text-text-main tracking-tighter uppercase text-sm">{res.exam?.title || 'Unknown Module'}</span>
+                                                    <span className="font-black text-text-main tracking-tighter uppercase text-sm">{res.exam?.title || 'Unknown Exam'}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <Clock size={12} className="text-text-muted" />
@@ -187,12 +187,12 @@ const Results = ({ user }) => {
                                                             onClick={() => handleEvaluate(res._id)}
                                                             className="btn-primary py-3 px-6 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ml-auto"
                                                         >
-                                                            Synchronize Result
+                                                            Grade Exam
                                                             <ArrowUpRight size={14} />
                                                         </button>
                                                     ) : (
                                                         <div className="flex items-center justify-end gap-2 text-text-muted opacity-30 font-black uppercase tracking-[0.2em] text-[10px]">
-                                                            Archived Node
+                                                            Result Recorded
                                                         </div>
                                                     )}
                                                 </td>
@@ -210,7 +210,7 @@ const Results = ({ user }) => {
                 <div className="h-[1px] bg-black/5 flex-1"></div>
                 <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-text-muted italic">
                     <Shield size={14} className="text-accent-coral" />
-                    End of Ledger Records
+                    End of Results
                 </div>
                 <div className="h-[1px] bg-black/5 flex-1"></div>
             </footer>

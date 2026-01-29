@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Clock, Calendar, ChevronRight, Lock, Search, Filter, Plus, FileText, Loader2, ArrowUpRight, CheckCircle } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Lock, Search, Filter, Plus, FileText, Loader2, ArrowUpRight, CheckCircle, ShieldCheck } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { motion } from 'framer-motion';
 
 const ExamList = ({ user }) => {
@@ -151,12 +152,35 @@ const ExamList = ({ user }) => {
                                     </Link>
                                 </div>
 
-                                {/* Static abstract chart decoration like in image */}
-                                <div className="flex gap-1 mt-6 h-1 w-full px-2 opacity-10">
-                                    {[0.3, 0.5, 0.8, 0.4, 0.6, 0.9, 0.5, 0.7].map((h, i) => (
-                                        <div key={i} className="flex-1 bg-text-main rounded-full"></div>
-                                    ))}
-                                </div>
+                                {(user.role === 'Student' ? !exam.isSubmitted : true) && (
+                                    <div className="mt-8 pt-6 border-t border-black/5 flex flex-col items-center gap-4 bg-sidebar-bg/30 rounded-3xl p-6 group-hover:bg-white transition-all duration-500">
+                                        <div className="flex items-center justify-between w-full mb-2">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-text-muted">
+                                                {user.role === 'Student' ? 'Access Token' : 'Shareable Link'}
+                                            </span>
+                                            <div className="flex items-center gap-1 text-[8px] font-black uppercase text-accent-mint">
+                                                {user.role === 'Student' ? <Lock size={10} /> : <div className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />}
+                                                {user.role === 'Student' ? 'AES Sealed' : 'Live URL'}
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-3 rounded-2xl shadow-sm">
+                                            <QRCodeSVG
+                                                value={user.role === 'Student'
+                                                    ? (exam.qrAccessToken || 'PENDING_PROVISION')
+                                                    : `${window.location.origin}/exams/${exam._id}`}
+                                                size={80}
+                                                level="M"
+                                                fgColor="#0F172A"
+                                            />
+                                        </div>
+                                        <p className="text-[8px] text-text-muted text-center font-medium leading-relaxed">
+                                            {user.role === 'Student'
+                                                ? <>Scan this <span className="text-text-main font-bold">Encrypted Handshake Token</span> at the entry point to verify your exam instance.</>
+                                                : <>Student can scan this <span className="text-text-main font-bold">Direct Link</span> to immediately access the exam page.</>
+                                            }
+                                        </p>
+                                    </div>
+                                )}
                             </motion.div>
                         ))
                     )}

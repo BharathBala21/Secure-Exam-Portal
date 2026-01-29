@@ -51,7 +51,6 @@ const Messaging = ({ user }) => {
         };
         init();
 
-        // Polling for new messages
         const interval = setInterval(fetchMessages, 10000);
         return () => clearInterval(interval);
     }, []);
@@ -69,7 +68,7 @@ const Messaging = ({ user }) => {
             setShowCompose(false);
             await fetchMessages();
         } catch (err) {
-            alert(err.response?.data?.message || 'Message dispatch failed');
+            alert(err.response?.data?.message || 'Message send failed');
         } finally {
             setIsSending(false);
         }
@@ -84,12 +83,12 @@ const Messaging = ({ user }) => {
         <div className="space-y-12">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-text-main uppercase italic">
-                        Secure <span className="text-text-muted">Comm</span>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-text-main italic uppercase">
+                        Portal <span className="text-text-muted">Messaging</span>
                     </h1>
                     <p className="text-text-muted mt-2 font-medium flex items-center gap-2">
-                        <Lock size={14} className="text-accent-mint" />
-                        End-to-End Cryptographic Messaging Active
+                        <Shield className="text-accent-coral" size={18} />
+                        End-to-End Encrypted Communication Center
                     </p>
                 </div>
 
@@ -98,49 +97,60 @@ const Messaging = ({ user }) => {
                     className="btn-primary"
                 >
                     <Send size={18} className="mr-2" />
-                    Compose Dispatch
+                    Compose Message
                 </button>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Search & Stats */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="surface-card p-6">
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                            <input
-                                type="text"
-                                placeholder="Search archives..."
-                                className="w-full bg-sidebar-bg/50 border border-black/5 rounded-2xl py-4 pl-12 pr-4 outline-none focus:bg-white focus:border-black/10 transition-all text-sm font-medium"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                <div className="xl:col-span-1 space-y-8">
+                    <div className="surface-card p-10 bg-white border-t-4 border-t-accent-dark">
+                        <h3 className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 mb-8">
+                            <Activity size={18} className="text-text-main" /> Messaging Security
+                        </h3>
+
+                        <div className="space-y-6">
+                            <ProtocolItem label="Encryption" value="AES-256-CBC" icon={<Lock size={12} />} />
+                            <ProtocolItem label="Verification" value="RSA Signature" icon={<Fingerprint size={12} />} />
+                            <ProtocolItem label="Integrity" value="SHA-256 Hash" icon={<ShieldCheck size={12} />} />
+                            <ProtocolItem label="Status" value="Secure" icon={<Clock size={12} />} />
                         </div>
                     </div>
 
                     <div className="surface-card p-8 bg-accent-dark text-white relative overflow-hidden">
                         <Megaphone size={120} className="absolute -right-10 -bottom-10 opacity-10 rotate-12" />
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-4">Protocol Status</h3>
+                        <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-4">Security Level</h3>
                         <div className="space-y-4 relative z-10">
                             <div className="flex items-center justify-between text-xs">
-                                <span className="text-white/60">Encryption</span>
-                                <span className="text-accent-mint font-bold uppercase">AES-256 GCM</span>
+                                <span className="text-white/60">Algorithm</span>
+                                <span className="text-accent-mint font-bold uppercase">AES-256</span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
-                                <span className="text-white/60">Signature</span>
+                                <span className="text-white/60">Digital Sig</span>
                                 <span className="text-accent-coral font-bold uppercase">RSA-Verify</span>
                             </div>
                             <div className="pt-4 border-t border-white/10">
                                 <p className="text-[10px] text-white/40 leading-relaxed italic">
-                                    All transmissions are symmetrically encrypted and stored in forensic-locked volumes.
+                                    Your messages are encrypted and only accessible to authorized recipients.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Message List */}
                 <div className="lg:col-span-3 space-y-4">
+                    <div className="surface-card p-6 mb-6">
+                        <div className="relative">
+                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Search messages..."
+                                className="input-field pl-14 h-14"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
                     <AnimatePresence mode="popLayout">
                         {isLoading ? (
                             <div className="flex items-center justify-center p-20">
@@ -153,7 +163,7 @@ const Messaging = ({ user }) => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className={`surface-card p-8 group hover:border-black/10 transition-all ${msg.isBroadcast ? 'border-l-4 border-l-accent-coral' : ''}`}
+                                    className={`surface-card p-8 group hover:border-black/10 transition-all ${msg.isBroadcast ? 'border-l-4 border-l-accent-coral' : 'border-l-4 border-l-accent-mint'}`}
                                 >
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-start gap-6">
@@ -163,15 +173,12 @@ const Messaging = ({ user }) => {
                                                 {msg.sender.name[0]}
                                             </div>
                                             <div>
-                                                <div className="flex items-center gap-3 mb-1">
-                                                    <span className="font-black text-text-main uppercase tracking-tighter italic text-lg">
-                                                        {msg.sender._id === user._id ? 'Sent Dispatch' : msg.sender.name}
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${msg.isBroadcast ? 'bg-accent-coral/20 text-accent-coral' : 'bg-accent-mint/20 text-accent-mint'}`}>
+                                                        {msg.isBroadcast ? 'Announcement' : 'Private'}
                                                     </span>
-                                                    {msg.isBroadcast && (
-                                                        <span className="badge-coral text-[9px]">Broadcast</span>
-                                                    )}
-                                                    <span className="text-[10px] font-black text-text-muted uppercase tracking-widest bg-sidebar-bg px-2 py-0.5 rounded-full">
-                                                        {msg.sender.role}
+                                                    <span className="text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                                        {msg.sender.name}
                                                     </span>
                                                 </div>
                                                 <p className="text-text-main font-medium leading-relaxed max-w-2xl">
@@ -182,30 +189,25 @@ const Messaging = ({ user }) => {
                                                         <Clock size={12} /> {new Date(msg.createdAt).toLocaleString()}
                                                     </span>
                                                     <span className="flex items-center gap-1 text-accent-mint">
-                                                        <ShieldCheck size={12} /> Encrypted Buffer Seal
+                                                        <ShieldCheck size={12} /> Encrypted
                                                     </span>
                                                     {msg.signature && (
                                                         <span className="flex items-center gap-1 text-accent-coral">
-                                                            <Fingerprint size={12} /> RSA Verified Origin
+                                                            <Fingerprint size={12} /> Verified Origin
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="text-text-muted hover:text-red-500">
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
                                     </div>
                                 </motion.div>
                             ))
                         ) : (
-                            <div className="surface-card p-20 text-center flex flex-col items-center gap-6 border-dashed">
-                                <MessageSquare size={48} className="text-text-muted/20" />
+                            <div className="surface-card p-12 bg-white flex flex-col items-center gap-6 text-center border-dashed">
+                                <Mail size={48} className="text-text-muted opacity-20" />
                                 <div>
-                                    <h3 className="font-black uppercase tracking-tighter text-text-muted">No communication archives found.</h3>
-                                    <p className="text-text-muted text-sm mt-2">End-to-end encrypted channel is ready for your first dispatch.</p>
+                                    <p className="text-sm font-black text-text-muted uppercase tracking-[0.2em]">No messages found</p>
+                                    <p className="text-xs text-text-muted/60 mt-2">Commence secure communication to see history here.</p>
                                 </div>
                             </div>
                         )}
@@ -233,17 +235,16 @@ const Messaging = ({ user }) => {
                         >
                             <div className="p-8 md:p-12">
                                 <div className="flex items-center justify-between mb-10">
-                                    <h2 className="text-2xl font-black uppercase italic tracking-tighter">New <span className="text-text-muted">Dispatch</span></h2>
+                                    <h2 className="text-2xl font-black uppercase italic tracking-tighter">New <span className="text-text-muted">Message</span></h2>
                                     <button
                                         onClick={() => setShowCompose(false)}
                                         className="text-text-muted hover:text-text-main font-black uppercase tracking-[0.2em] text-[10px]"
                                     >
-                                        Abort
+                                        Cancel
                                     </button>
                                 </div>
 
                                 <form onSubmit={handleSend} className="space-y-8">
-                                    {/* Role-based Broadcast selector */}
                                     {(user.role === 'Faculty' || user.role === 'Admin') && (
                                         <div className="flex items-center gap-4 p-5 bg-sidebar-bg/50 rounded-2xl border border-black/5">
                                             <input
@@ -254,35 +255,33 @@ const Messaging = ({ user }) => {
                                                 onChange={(e) => setNewMessage({ ...newMessage, isBroadcast: e.target.checked, receiverId: e.target.checked ? '' : newMessage.receiverId })}
                                             />
                                             <label htmlFor="broadcast" className="text-sm font-black uppercase tracking-widest text-text-main cursor-pointer flex items-center gap-2">
-                                                <Megaphone size={16} className="text-accent-coral" /> Broadcast to All Nodes
+                                                <Megaphone size={16} className="text-accent-coral" /> Broadcast to All Students
                                             </label>
                                         </div>
                                     )}
 
                                     {!newMessage.isBroadcast && (
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted ml-1">Destination Node</label>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Select Recipient</label>
                                             <select
-                                                className="w-full bg-sidebar-bg/50 p-6 rounded-2xl border border-black/5 text-sm font-bold outline-none focus:bg-white focus:border-black/10 transition-all appearance-none"
+                                                className="input-field h-14"
                                                 value={newMessage.receiverId}
                                                 onChange={(e) => setNewMessage({ ...newMessage, receiverId: e.target.value })}
                                                 required={!newMessage.isBroadcast}
                                             >
-                                                <option value="">Select Identity...</option>
+                                                <option value="">Choose User...</option>
                                                 {recipients.map(r => (
-                                                    <option key={r._id} value={r._id}>
-                                                        {r.name} ({r.role}) {r.rollNumber ? `- ${r.rollNumber}` : ''}
-                                                    </option>
+                                                    <option key={r._id} value={r._id}>{r.name} ({r.role})</option>
                                                 ))}
                                             </select>
                                         </div>
                                     )}
 
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted ml-1">Secure Content Payload</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Message Body</label>
                                         <textarea
-                                            placeholder="Enter your encrypted message..."
-                                            className="w-full bg-sidebar-bg/50 p-6 rounded-2xl border border-black/5 text-sm font-medium h-40 outline-none focus:bg-white focus:border-black/10 transition-all resize-none"
+                                            className="input-field min-h-[160px] py-6 resize-none"
+                                            placeholder="Write your message here..."
                                             value={newMessage.content}
                                             onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
                                             required
@@ -292,16 +291,16 @@ const Messaging = ({ user }) => {
                                     <div className="p-6 bg-accent-mint/5 border border-accent-mint/10 rounded-2xl flex items-center gap-4">
                                         <Lock size={20} className="text-accent-mint" />
                                         <p className="text-[10px] text-accent-mint font-black uppercase tracking-widest">
-                                            Symmetric AES-256 seal will be applied during transit.
+                                            AES-256 Encryption will be applied automatically.
                                         </p>
                                     </div>
 
                                     <button
                                         type="submit"
-                                        disabled={isSending}
                                         className="btn-primary w-full h-16"
+                                        disabled={isSending}
                                     >
-                                        {isSending ? 'Initiating Handshake...' : 'Seal & Dispatch'}
+                                        {isSending ? 'Encrypting & Sending...' : 'Secure Send'}
                                         <ArrowUpRight size={18} className="ml-2" />
                                     </button>
                                 </form>
@@ -313,5 +312,19 @@ const Messaging = ({ user }) => {
         </div>
     );
 };
+
+const ProtocolItem = ({ label, value, icon }) => (
+    <div className="flex items-center justify-between group/proto">
+        <div className="flex items-center gap-3">
+            <div className="text-text-muted group-hover/proto:text-text-main transition-colors">
+                {icon}
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/40">{label}</span>
+        </div>
+        <span className="text-[10px] font-black text-text-main tracking-tight uppercase">{value}</span>
+    </div>
+);
+
+const Activity = ({ size, className }) => <Shield size={size} className={className} />;
 
 export default Messaging;

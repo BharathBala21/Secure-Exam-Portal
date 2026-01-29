@@ -53,14 +53,14 @@ const Register = () => {
                                 <Shield className="text-accent-mint w-12 h-12" />
                             </div>
                             <h1 className="text-3xl md:text-4xl font-black text-text-main tracking-tighter uppercase italic mb-3">
-                                Identity <span className="text-text-muted">Provisioned</span>
+                                Account <span className="text-text-muted">Created</span>
                             </h1>
-                            <p className="text-text-muted font-medium">Your profile has been cryptographically secured with asymmetric keys.</p>
+                            <p className="text-text-muted font-medium">Your profile is secured with RSA cryptographic keys.</p>
 
                             {registeredData.role === 'Student' && (
                                 <div className="mt-8 p-5 bg-accent-coral/5 border border-accent-coral/10 rounded-2xl text-accent-coral text-xs font-black uppercase tracking-widest flex items-center justify-center gap-3">
                                     <div className="w-2 h-2 bg-accent-coral rounded-full animate-pulse"></div>
-                                    Awaiting Administrative Handshake (Approval Pending)
+                                    Awaiting Administrative Approval
                                 </div>
                             )}
                         </div>
@@ -68,13 +68,13 @@ const Register = () => {
                         <div className="space-y-8">
                             <div className="bg-sidebar-bg p-8 rounded-[2rem] border border-black/5 relative group">
                                 <div className="flex justify-between items-center mb-6">
-                                    <p className="text-[10px] font-black text-text-main uppercase tracking-[0.3em]">Signature Matrix (Private Key)</p>
+                                    <p className="text-[10px] font-black text-text-main uppercase tracking-[0.3em]">Signature Key (Private Key)</p>
                                     <button
                                         onClick={copyToClipboard}
                                         className="btn-secondary py-2 px-4 h-auto normal-case tracking-normal text-xs"
                                     >
                                         {copied ? <Check size={14} className="text-accent-mint mr-2" /> : <Copy size={14} className="mr-2" />}
-                                        {copied ? 'Captured' : 'Capture Key'}
+                                        {copied ? 'Copied' : 'Copy Key'}
                                     </button>
                                 </div>
                                 <div className="relative group/key">
@@ -92,8 +92,8 @@ const Register = () => {
                             <div className="flex items-start gap-4 p-6 rounded-2xl border border-red-100 bg-red-50/50">
                                 <AlertTriangle className="text-red-500 flex-shrink-0" size={20} />
                                 <div>
-                                    <p className="text-xs font-black text-red-500 uppercase tracking-widest mb-1">Critical Protocol Notice</p>
-                                    <p className="text-[11px] text-red-400 font-medium leading-relaxed">This matrix is required for all cryptographic signings. Failure to store this key will result in permanent loss of participation capabilities. We do not persist this key on our nodes.</p>
+                                    <p className="text-xs font-black text-red-500 uppercase tracking-widest mb-1">Critical Security Notice</p>
+                                    <p className="text-[11px] text-red-400 font-medium leading-relaxed">This key is required for all exam submissions. Failure to store this key will result in permanent loss of your signing capability. We do not store this key on our servers.</p>
                                 </div>
                             </div>
                         </div>
@@ -124,9 +124,9 @@ const Register = () => {
                             <UserPlus className="text-white w-10 h-10" />
                         </div>
                         <h1 className="text-3xl font-black tracking-tighter text-text-main uppercase italic">
-                            Initialize <span className="text-text-muted">Identity</span>
+                            Create <span className="text-text-muted">Account</span>
                         </h1>
-                        <p className="text-text-muted text-sm font-medium mt-2">Provision a new node on the secure academic network</p>
+                        <p className="text-text-muted text-sm font-medium mt-2">Join the secure academic portal</p>
                     </div>
 
                     <AnimatePresence mode="wait">
@@ -144,7 +144,7 @@ const Register = () => {
                     <form onSubmit={handleRegister} className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Full Legal Name</label>
+                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Full Name</label>
                                 <div className="relative group">
                                     <User className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted transition-colors group-focus-within:text-text-main" size={18} />
                                     <input
@@ -159,7 +159,7 @@ const Register = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Node Role</label>
+                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Portal Role</label>
                                 <div className="relative group">
                                     <Briefcase className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-text-main pointer-events-none" size={18} />
                                     <select
@@ -177,7 +177,7 @@ const Register = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Official Email</label>
+                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Email Address</label>
                                 <div className="relative group">
                                     <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted transition-colors group-focus-within:text-text-main" size={18} />
                                     <input
@@ -192,7 +192,7 @@ const Register = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Credential ID</label>
+                                <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-2">Roll Number / ID</label>
                                 <div className="relative group">
                                     <FileText className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted transition-colors group-focus-within:text-text-main" size={18} />
                                     <input
@@ -231,7 +231,7 @@ const Register = () => {
                                 <Loader2 className="animate-spin" size={24} />
                             ) : (
                                 <>
-                                    Provision Identity
+                                    Create Account
                                     <ChevronRight size={18} className="ml-3" />
                                 </>
                             )}

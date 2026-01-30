@@ -12,10 +12,16 @@ const xlsx = require('xlsx');
 const createExam = async (req, res, next) => {
     try {
         const { title, description, questions, startTime, endTime, duration } = req.body;
+        // Encrypt correct options before saving to database
+        const encryptedQuestions = questions.map(q => ({
+            ...q,
+            correctOption: encryptAES(q.correctOption.toString())
+        }));
+
         const exam = await Exam.create({
             title,
             description,
-            questions,
+            questions: encryptedQuestions,
             startTime,
             endTime,
             duration: duration || 60,
@@ -93,9 +99,17 @@ const getExamById = async (req, res, next) => {
             return res.json(sanitizedExam);
         }
 
-        // If teacher/admin fetching, they see full details but this endpoint 
-        // shouldn't be used for "taking" tests by them anyway.
-        res.json(exam);
+        // If teacher/admin fetching, they see full details with decrypted options
+        const decryptedExam = exam.toObject();
+        decryptedExam.questions = decryptedExam.questions.map(q => {
+            try {
+                return { ...q, correctOption: Number(decryptAES(q.correctOption)) };
+            } catch (e) {
+                // If decryption fails, it might be legacy plain data
+                return q;
+            }
+        });
+        res.json(decryptedExam);
     } catch (error) {
         next(error);
     }
@@ -166,7 +180,14 @@ const evaluateSubmission = async (req, res, next) => {
 
         let marks = 0;
         exam.questions.forEach((q, index) => {
-            if (answers[index] === q.correctOption) {
+            let decryptedCorrectOption;
+            try {
+                decryptedCorrectOption = Number(decryptAES(q.correctOption));
+            } catch (e) {
+                decryptedCorrectOption = Number(q.correctOption);
+            }
+
+            if (answers[index] === decryptedCorrectOption) {
                 marks += q.marks;
             }
         });

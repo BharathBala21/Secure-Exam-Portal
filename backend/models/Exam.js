@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const questionSchema = mongoose.Schema({
     questionText: { type: String, required: true },
     options: [{ type: String, required: true }],
-    correctOption: { type: Number, required: true }, // Index of correct option
+    correctOption: { type: String, required: true }, // Encrypted index of correct option
     marks: { type: Number, default: 1 }
 });
 

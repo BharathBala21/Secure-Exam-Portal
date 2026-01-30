@@ -150,4 +150,17 @@ const verifyOTP = async (req, res, next) => {
     }
 };
 
-module.exports = { registerUser, loginUser, verifyOTP };
+const getUserProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id).select('-password -privateKey');
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { registerUser, loginUser, verifyOTP, getUserProfile };

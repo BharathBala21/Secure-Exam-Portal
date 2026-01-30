@@ -163,7 +163,7 @@ const Login = ({ setUser }) => {
                                     className="btn-primary w-full h-16"
                                     disabled={isLoading}
                                 >
-                                    {isLoading ? <Loader2 className="animate-spin mx-auto" size={24} /> : 'Complete Handshake'}
+                                    {isLoading ? <Loader2 className="animate-spin mx-auto" size={24} /> : 'Sign in'}
                                 </button>
                                 <button
                                     type="button"

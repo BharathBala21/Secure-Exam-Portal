@@ -61,6 +61,7 @@ const Dashboard = ({ user }) => {
                     </h1>
                     <p className="text-text-muted mt-2 font-medium">
                         Secure session established for <span className="text-text-main font-bold">{user.name}</span>
+                        <Link to="/profile" className="ml-3 text-[10px] font-black uppercase tracking-widest text-accent-coral hover:underline underline-offset-4 decoration-2">View Identity Profile</Link>
                     </p>
                 </div>
 

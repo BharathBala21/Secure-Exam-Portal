@@ -65,6 +65,13 @@ const Navbar = ({ user, logout }) => {
                                 <div className="w-1.5 h-1.5 bg-accent-mint rounded-full animate-pulse"></div>
                                 {user.role} Account
                             </span>
+                            <Link
+                                to="/profile"
+                                className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all ${isActive('/profile') ? 'bg-accent-dark text-white' : 'bg-sidebar-bg text-text-muted hover:bg-black/5 hover:text-text-main'}`}
+                                title="My Profile"
+                            >
+                                <UserIcon size={20} />
+                            </Link>
                             <button
                                 onClick={logout}
                                 className="w-12 h-12 flex items-center justify-center rounded-xl bg-sidebar-bg text-text-muted hover:bg-accent-coral/10 hover:text-accent-coral transition-all"
@@ -107,6 +114,17 @@ const Navbar = ({ user, logout }) => {
                                 <span className="font-black uppercase tracking-widest text-xs">{link.label}</span>
                             </Link>
                         ))}
+                        <Link
+                            to="/profile"
+                            onClick={() => setIsOpen(false)}
+                            className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${isActive('/profile')
+                                ? 'bg-accent-dark text-white'
+                                : 'bg-sidebar-bg text-text-muted hover:text-text-main'
+                                }`}
+                        >
+                            <UserIcon size={18} />
+                            <span className="font-black uppercase tracking-widest text-xs">My Profile</span>
+                        </Link>
                     </div>
                     <div className="pt-6 border-t border-black/5 flex items-center justify-between">
                         <span className="badge-mint">{user.role} ACCOUNT</span>

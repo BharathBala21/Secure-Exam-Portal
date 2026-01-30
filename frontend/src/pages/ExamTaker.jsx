@@ -188,7 +188,7 @@ const ExamTaker = ({ user }) => {
                             <div className="flex justify-between items-center mb-12">
                                 <span className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] flex items-center gap-3">
                                     <div className="w-2 h-2 bg-accent-mint rounded-full animate-pulse"></div>
-                                    Synchronizing Node {currentQuestion + 1}
+                                    Question No:  {currentQuestion + 1}
                                 </span>
                                 <span className="text-[10px] font-black font-mono text-white bg-accent-dark px-4 py-1.5 rounded-full tracking-tighter italic">
                                     PROG: {Math.round(progress)}%
@@ -264,7 +264,7 @@ const ExamTaker = ({ user }) => {
                             >
                                 {isSubmitting ? <Loader2 className="animate-spin" size={24} /> : (
                                     <>
-                                        Authorize & Sync Ledger
+                                        Finish
                                         <Send size={18} className="ml-3" />
                                     </>
                                 )}
@@ -284,7 +284,7 @@ const ExamTaker = ({ user }) => {
                     </div>
 
                     <div className="surface-card p-8 bg-white">
-                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mb-8">Node Map</h3>
+                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mb-8">Questions</h3>
                         <div className="grid grid-cols-4 gap-3">
                             {exam.questions.map((_, i) => (
                                 <button
